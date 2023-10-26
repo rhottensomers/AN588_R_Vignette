@@ -1,0 +1,39 @@
+---
+title: "Bioacoustic Vignette"
+author: "Reese Hotten-Somers"
+date: "2023-10-26"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+## Intro to Bioacoustics:
+What is bioacoustics?
+
+Who uses it?
+
+How it's implemented?
+
+What it can be used for and why it is important?
+
+## Preliminaries
+Install packages: {bioacoustics}, {warbleR}, {randomForest}, {Rraven}
+
+## Objectives
+
+
+## Load in Packages
+```{r, prelims}
+library(warbleR)
+library(bioacoustics)
+library(tools)
+library(randomForest)
+
+df1 = query_xc(qword ='Catharus bicknelli type:call cnt:"United States"', download = FALSE)
+df1 = df1[df1$Vocalization_type=="call",]
+df1 = df1[df1$Quality=="A",]
+df1 = df1[1:9,]
+View(df1)
+```
+
