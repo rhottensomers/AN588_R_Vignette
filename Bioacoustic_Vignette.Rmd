@@ -30,12 +30,32 @@ library(bioacoustics)
 library(tools)
 library(randomForest)
 
-df1 = query_xc(qword ='Catharus bicknelli type:call cnt:"United States"', download = FALSE)
+
+
+```
+
+# Importing Data from the internet
+Warblr comes with the function query_xc which allows you to seamlessly import audio data from xeno-canto[https://xeno-canto.org/484847].
+```{r, importing}
+#pulling all Strepera versicolor calls without downloading locally
+df1 = query_xc(qword ='Strepera versicolor type:call cnt:"Australia"', download = FALSE) #todo: include explanation for parameters of query_xc
+
+#Filter by type   
 df1 = df1[df1$Vocalization_type=="call",]
 df1 = df1[df1$Quality=="A",]
 df1 = df1[1:9,]
 View(df1)
 
+```
 
+# Importing Your Own Data
+However, you can also import your own MP3
+```{r, importing_mp3}
+
+```
+
+# Reading Your file
+```{r, readf}
+query_xc(X = df1, download = TRUE, path = getwd())
 ```
 
