@@ -46,6 +46,9 @@ df1 = df1[df1$Quality=="A",]
 df1 = df1[1:9,]
 View(df1)
 
+#Download data to working directory
+query_xc(X = df1, download = TRUE, path = getwd())
+
 ```
 
 # Importing Your Own Data
@@ -56,6 +59,39 @@ However, you can also import your own MP3
 
 # Reading Your file
 ```{r, readf}
-query_xc(X = df1, download = TRUE, path = getwd())
+#Just One!
+STREPV <- read_audio(file.path(getwd(), "Strepera-versicolor-571957.mp3"))
+STREPV
+
+
+
+
+#Read them all!!!!
+read_all_mp3 <- function(){
+  # List all mp3 files in current directory
+  mp3_files = list.files(path=".", pattern=".mp3", all.files=TRUE, 
+                         full.names=TRUE)
+  audio_list <- list()
+  for(files in mp3_files) {
+    curr_file_path <- read_audio(file.path(files))
+    audio_list <- append(audio_list, curr_file_path)
+  }
+  return(audio_list)
+}
+
+read_all_mp3()
+
+#first ten seconds
+
+# Set plot margins to 0
+par(mar = c(0, 0, 0, 0), oma = c(0, 0, 0, 0))
+
+# Display with spectro()
+ticks <- c(from = 1000, to = 20000, by = 1000)
+
+temp_slice <- c(from = 1, to = 10) # in seconds
+spectro(STREPV, tlim = temp_slice, FFT_size = 512, ticks_y = ticks)
+#OR 
+plot(STREPV)
 ```
 
