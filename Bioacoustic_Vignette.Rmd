@@ -93,5 +93,24 @@ temp_slice <- c(from = 1, to = 10) # in seconds
 spectro(STREPV, tlim = temp_slice, FFT_size = 512, ticks_y = ticks)
 #OR 
 plot(STREPV)
+
+#mp3_to_wav
+
+
+#metadata extraction
+metadata(STREPV)
+```
+
+```{r, read_data}
+image(fspec(STREPV, tlim = temp_slice, rotate = TRUE)) #A matrix of amplitude or decibel (dB) values in the time / frequency domain.
+
+spectro(STREPV, tlim = temp_slice, FFT_size = 512, ticks_y = ticks)
+
+spec_mx <- fspec(STREPV, tlim = temp_slice, FFT_size = 512, rotate = TRUE)
+image(spec_mx, xaxt = "n", yaxt = "n") 
+
+
+plot_zc() # used for generating a spectrgram for zero-crossing files
+class(STREPV) #however it does not work for our data because the data class is wave and not zc
 ```
 
