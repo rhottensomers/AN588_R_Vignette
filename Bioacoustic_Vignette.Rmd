@@ -122,6 +122,7 @@ NOTE: Y axis is frequency in hertz and X axis is time. However spectro() does no
 ```{r, fspec}
 image(fspec(STREPV, tlim = temp_slice, rotate = TRUE)) #A matrix of amplitude or decibel (dB) values in the time / frequency domain.
 
+# col = hcl.colors(20, "viridis", rev = TRUE
 ```
 
 NOTE: If you have older zero-crossing bat vocalization patterns, then the functions write_zc() and plot_zc() will serve as replacements for fspec() and spectro(). (Add in paragraph after running through spectro and fspec() with an asterisk)
@@ -139,16 +140,30 @@ blob_detect
 
 # Threshold_detection
 ?threshold_detection
-threshold_detect <- threshold_detection(
-  STREPV, threshold = 5, time_exp = 1, min_dur = 140, max_dur = 440, 
-  min_TBE = 10, max_TBE = 5000, EDG = 0.996, LPF = 10000, HPF = 1000, 
-  FFT_size = 1024, FFT_overlap = 0.875, start_thr = 25, end_thr = 30, 
-  SNR_thr = 10, angle_thr = 45, duration_thr = 440, NWS = 1000, 
-  KPE = 1e-05, KME = 1e-04, settings = FALSE, acoustic_feat = TRUE,
-  metadata = FALSE, spectro_dir = file.path(getwd(), "Spectros"), time_scale = 1, 
-  ticks = c(1000, 10000, 1000) # Tick marks from 1 to 10 kHz with 1 kHz interval
-) 
-threshold_detection
+TD <- threshold_detection(
+  STREPV, 
+  threshold = 12,   time_exp = 1,  min_dur = 140,   max_dur = 440,   min_TBE = 10,  max_TBE = 5000, 
+  EDG = 0.996, 
+  LPF = 10000, 
+  HPF = 1000, 
+  FFT_size = 256, 
+  FFT_overlap = 0.875, 
+  start_thr = 20, 
+  end_thr = 30, 
+  SNR_thr = 8, 
+  angle_thr = 125, 
+  duration_thr = 440, 
+  NWS = 1000, 
+  KPE = 1e-05, 
+  KME = 1e-04, 
+  settings = FALSE, 
+  acoustic_feat = TRUE, 
+  metadata = FALSE, 
+  spectro_dir = file.path(getwd(), "Spectros"), 
+  time_scale = 1, 
+  ticks = TRUE
+)
+TD
 
 
 # auto_detec automatically detects the start and end of vocalizations in sound files based on amplitude, duration, and frequency range attributes.
@@ -165,80 +180,4 @@ detection$sound.files
 label_spectro(wave = STREPV, detection = detection[detection$sound.files == "Strepera-versicolor-571957.mp3", ], hop.size = 10, ovlp = 50, flim = c(1, 10), fastdisp=TRUE) 
 
 ```
-
-```{r, yourowndata}
-wav <- read_audio(file.path(getwd(), "mgr.wav"))
-
-#Displaying your sound
-# Display with spectro()
-ticks <- c(from = 1000, to = 20000, by = 1000) # Frequency tick marks from 1 to 20 kHz, and steps at each 1 kHz
-temp_slice <- c(from = 1, to = 10) # Time slice in seconds
-
-spectro(wav, tlim = temp_slice, FFT_size = 512, ticks_y = ticks)
-
-# Display with fspec
-# fspec() gives you the spectrogram matrix with energy values (dB)
-spec_mx <- fspec(wav, tlim = temp_slice, FFT_size = 512, rotate = TRUE)
-
-# You can display the spectrogram with image()
-image(spec_mx, xaxt = "n", yaxt = "n")
-
-# Set each argument according to the targeted audio events
-TD <- threshold_detection(
-  STREPV, 
-  threshold = 2,   time_exp = 1,  min_dur = 140,   max_dur = 440,   min_TBE = 10,  max_TBE = 5000, 
-  EDG = 0.996, 
-  LPF = 10000, 
-  HPF = 1000, 
-  FFT_size = 256, 
-  FFT_overlap = 0.875, 
-  start_thr = 25, 
-  end_thr = 30, 
-  SNR_thr = 10, 
-  angle_thr = 45, 
-  duration_thr = 440, 
-  NWS = 1000, 
-  KPE = 1e-05, 
-  KME = 1e-04, 
-  settings = FALSE, 
-  acoustic_feat = TRUE, 
-  metadata = FALSE, 
-  spectro_dir = file.path(getwd(), "Spectros"), 
-  time_scale = 1, 
-  ticks = TRUE
-)
-
-nrow(TD$data$event_data)
-
-read_all_mp3()
-
-#this is the same
-BD <- blob_detection(
-  STREPV, # Either a path to an audio file (see ?read_audio), or a Wave object
-  time_exp = 10, # Time expansion factor of 10 for time expanded recordings.
-  min_dur = 1.5, # Minimum duration threshold of 1.5 milliseconds (ms)
-  max_dur = 80, # Maximum duration threshold of 80 ms
-  min_area = 40, # minimum number of 40 pixels in the blob
-  min_TBE = 20, # Minimum time window between two audio events of 20 milliseconds
-  EDG = 0.996, # Temporal masking with Exponential Decay Gain from 0 to 1
-  LPF = slot(myotis, "samp.rate") * 10 / 2, # Low-Pass Filter at the Nyquist frequency
-  HPF = 16000, # High-Pass Filter of 16 kHz
-  FFT_size = 256, # Size of the Fast Fourrier Transform (FFT) window
-  FFT_overlap = 0.875, # Percentage of overlap between two FFT windows
-  
-  blur = 2, # Gaussian smoothing function with a factor of 2 for blurring the spectrogram
-  bg_substract = 20, # Foreground extraction with a mean filter applied on the spectrogram
-  contrast_boost = 20, # Edge contrast enhancement filter of the spectrogram contour
-  
-  settings = FALSE, #  Save on a list the above parameters set with this function
-  acoustic_feat = TRUE, # Extracts the acoustic and signal quality parameters 
-  metadata = FALSE, # Extracts on a list the metadata embedded with the Wave file
-  spectro_dir = file.path(tempdir(), "Spectros"), # HTML page with spectrograms by order of detection 
-  time_scale = 0.1, # Time resolution of 2 ms for spectrogram display
-  ticks = TRUE # Tick marks and their intervals are drawn on y-axis (frequencies)
-) 
-
-
-```
-
 
