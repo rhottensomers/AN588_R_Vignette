@@ -8,6 +8,11 @@ output: html_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
+# TO DO:
+Typical frequency ranges for humans, apes, birds, bats, frogs, and whales/dophins
+Comments
+Challenges
+
 ## Intro to Bioacoustics:
 What is bioacoustics?
 
@@ -54,7 +59,9 @@ query_xc(X = df1, download = TRUE, path = getwd())
 # Importing Your Own Data
 However, you can also import your own MP3
 ```{r, importing_mp3}
+#Loading in own recording #Challenge
 
+wav <- read_audio(file.path(getwd(), "mgr.wav"))
 ```
 
 # Reading Your file
@@ -79,7 +86,13 @@ read_all_mp3 <- function(){
 
 read_all_mp3()
 
-
+#Reading a wave object: Duration, file length/durations
+#Number of samples, number of intervals taken from the file
+#Sample rate, the rate of each sample taken. Here's a nice visual[https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/Signal_Sampling.svg/1920px-Signal_Sampling.svg.png]
+  #You can find number of samples by multiplying the Samplingrate by Duration
+#Channels: Is the audio recorded from one source or "channel"(mono) or multiple channels (stereo)
+#PCM is a method used to "digitally represent sampled analog signals."
+#Bit is the number of bit per sample
 ```
 
 ```{r, plotp}
@@ -89,30 +102,29 @@ ticks <- c(from = 1000, to = 20000, by = 1000)
 temp_slice <- c(from = 1, to = 10) # in seconds
 
 plot(STREPV)
+
+#Let's zoom in
+plot(STREPV, xlim = c(3, 5)) #This is a waveform,  x axis is the time of the file and the yaxis is a amplitude, or the displacement of a particle
+```
+
+
+```{r, steroplot}
+STREPV2 <- read_audio(file.path(getwd(), "Strepera-versicolor-743906.mp3"))
+STREPV2
+plot(STREPV2)
 ```
 
 ```{r, spectro}
-spectro(STREPV, tlim = temp_slice, FFT_size = 512, ticks_y = ticks) #todo: figure out axis range and label it
+spectro(STREPV, tlim = temp_slice, FFT_size = 512, ticks_y = ticks) #sets the y axis labeling, in Hz, so its 1 kHz to 100 kHz, in 1 kHz interval
 ```
+NOTE: Y axis is frequency in hertz and X axis is time. However spectro() does not have the ability to add x axis label so it should only be used for visualization. 
 
 ```{r, fspec}
 image(fspec(STREPV, tlim = temp_slice, rotate = TRUE)) #A matrix of amplitude or decibel (dB) values in the time / frequency domain.
 
 ```
 
-If you have older zero-crossing bat vocalization patterns, then the functions write_zc() and plot_zc() will serve as replacements for fspec() and spectro(). (Add in paragraph after running through spectro and fspec() with an asterisk)
-```{r, zc}
-#using plot_zc #can't get this to work
-
-zc <- write_zc(zc,filename = "mgr.wav")
-zcfile <- read_zc(zc)
-
-zcplot <- plot_zc(wav,  LPF = 125000,
-                  HPF = 16000,   tlim = c(0, 10),
-                  flim = c(HPF, LPF))
-
-```
-
+NOTE: If you have older zero-crossing bat vocalization patterns, then the functions write_zc() and plot_zc() will serve as replacements for fspec() and spectro(). (Add in paragraph after running through spectro and fspec() with an asterisk)
 
 
 ```{r, plot_data}
@@ -122,18 +134,18 @@ zcplot <- plot_zc(wav,  LPF = 125000,
 ?blob_detection
 blob_detect <- blob_detection(
   STREPV, time_exp = 10, FFT_size = 512, settings = FALSE, acoustic_feat = TRUE,
-  metadata = FALSE, spectro_dir = file.path(tempdir(), "Spectros"), time_scale = 0.1, ticks = TRUE)
+  metadata = FALSE, spectro_dir = file.path(getwd(), "Spectros"), time_scale = 0.1, ticks = TRUE)
 blob_detect
 
 # Threshold_detection
 ?threshold_detection
 threshold_detect <- threshold_detection(
-  STREPV, threshold = 12, time_exp = 1, min_dur = 140, max_dur = 440, 
+  STREPV, threshold = 5, time_exp = 1, min_dur = 140, max_dur = 440, 
   min_TBE = 10, max_TBE = 5000, EDG = 0.996, LPF = 10000, HPF = 1000, 
   FFT_size = 1024, FFT_overlap = 0.875, start_thr = 25, end_thr = 30, 
   SNR_thr = 10, angle_thr = 45, duration_thr = 440, NWS = 1000, 
   KPE = 1e-05, KME = 1e-04, settings = FALSE, acoustic_feat = TRUE,
-  metadata = FALSE, spectro_dir = file.path(tempdir(), "Spectros"), time_scale = 1, 
+  metadata = FALSE, spectro_dir = file.path(getwd(), "Spectros"), time_scale = 1, 
   ticks = c(1000, 10000, 1000) # Tick marks from 1 to 10 kHz with 1 kHz interval
 ) 
 threshold_detection
@@ -155,8 +167,6 @@ label_spectro(wave = STREPV, detection = detection[detection$sound.files == "Str
 ```
 
 ```{r, yourowndata}
-#Loading in own recording #Challenge
-
 wav <- read_audio(file.path(getwd(), "mgr.wav"))
 
 #Displaying your sound
@@ -175,8 +185,8 @@ image(spec_mx, xaxt = "n", yaxt = "n")
 
 # Set each argument according to the targeted audio events
 TD <- threshold_detection(
-  wav, 
-  threshold = 12,   time_exp = 1,  min_dur = 140,   max_dur = 440,   min_TBE = 10,  max_TBE = 5000, 
+  STREPV, 
+  threshold = 2,   time_exp = 1,  min_dur = 140,   max_dur = 440,   min_TBE = 10,  max_TBE = 5000, 
   EDG = 0.996, 
   LPF = 10000, 
   HPF = 1000, 
@@ -193,17 +203,18 @@ TD <- threshold_detection(
   settings = FALSE, 
   acoustic_feat = TRUE, 
   metadata = FALSE, 
-  spectro_dir = file.path(tempdir(), "Spectros"), 
+  spectro_dir = file.path(getwd(), "Spectros"), 
   time_scale = 1, 
   ticks = TRUE
 )
 
 nrow(TD$data$event_data)
 
+read_all_mp3()
 
 #this is the same
 BD <- blob_detection(
-  wav, # Either a path to an audio file (see ?read_audio), or a Wave object
+  STREPV, # Either a path to an audio file (see ?read_audio), or a Wave object
   time_exp = 10, # Time expansion factor of 10 for time expanded recordings.
   min_dur = 1.5, # Minimum duration threshold of 1.5 milliseconds (ms)
   max_dur = 80, # Maximum duration threshold of 80 ms
