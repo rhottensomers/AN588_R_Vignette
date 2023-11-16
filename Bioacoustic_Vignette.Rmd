@@ -165,10 +165,37 @@ image(fspec(STREPV, tlim = temp_slice, rotate = TRUE, col = hcl.colors(20, "viri
 NOTE: If you have older zero-crossing bat vocalization patterns, then the functions write_zc() and plot_zc() will serve as replacements for fspec() and spectro(). (Add in paragraph after running through spectro and fspec() with an asterisk)
 
 # Plotting the data
+Now that we have the prepared audiofile in its manipulatative form, we can filter the desired sounds(the bird calls) from background noise(other bird noises, self noise, etc).
 
+Blob_detection is one function that detects and filters audio and displays them in batches. 
+It is a common type of detection/filtration algorithm used not only in audio analysis, but also image processing. Blob detection can be used to filter and identify colors, intensity/brightness etc. 
+
+```{r blob_detec}
+# blob_detection
+#?blob_detection 
+blob_detect <- blob_detection(
+  STREPV, #the waveform of the audiofile
+  time_exp = 1, #Time expansion factor, 1 represents real time
+  min_dur = 25, #min duration of an audio event to be recoreded, in ms
+  max_dur = 1500, #Max duration of audio event, in ms, based on audio 1.5 seconds(1500 ms) is the average length of the birds call
+  LPF = 8000, #Frequnecies above this cutoff are attenuated
+  HPF = 1000, #Frequencies below the cutoff are greatly attenuated.
+  min_TBE = 10,
+  max_TBE = 10000,
+  blur = 0,
+  FFT_size = 256, #
+  settings = FALSE, #simply does not save the parameters for the threshold_detection
+  acoustic_feat = TRUE, 
+  metadata = FALSE, #extracts metadata in a dataframe
+  spectro_dir = file.path(getwd(), "Spectros"), #Gives directions of the folder containing the .png files
+  ticks = TRUE) 
+blob_detect
+```
+The function returns an HTML file which shows all the audio events that fall within the parameters of the function
+
+
+Threshold detection is another form of detection that identifies events based on the SNR, the signal-to-noise ratio. If the amplitude is above the SNR, an audio event is recorded.
 ```{r, plot_data}
-
-
 # blob_detection
 ?blob_detection
 blob_detect <- blob_detection(
@@ -180,7 +207,12 @@ blob_detect
 ?threshold_detection
 TD <- threshold_detection(
   STREPV, 
-  threshold = 12,   time_exp = 1,  min_dur = 140,   max_dur = 440,   min_TBE = 10,  max_TBE = 5000, 
+  threshold = 12, #threshold sets the sensitivity of the event, compared to the SNR
+  time_exp = 1,
+  min_dur = 140, #min duration for 1 audio event
+  max_dur = 440, #max duration for an audio event
+  min_TBE = 10,  
+  max_TBE = 5000, 
   EDG = 0.996, 
   LPF = 10000, 
   HPF = 1000, 
