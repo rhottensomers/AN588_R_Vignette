@@ -8,10 +8,13 @@ output: html_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
-# TO DO:
-Typical frequency ranges for humans, apes, birds, bats, frogs, and whales/dophins
-Comments
-Challenges
+
+# TO DO by Teusday morning:
+Reese will make the file pretty (everyone will say when they are done)
+Sofia: Add pictures (of the bird we are analyzing)
+Paige: Typical frequency ranges for humans, apes, birds, bats, frogs, and whales/dolphins
+Allister: Add the mp3 file that is playable to the markdown
+Ritika: Deep learning
 
 ##Preliminaries: 
 Install these packages in *R*:{bioacoustics}, {warbleR}, {randomForest}, {Rraven}
@@ -32,9 +35,11 @@ library(warbleR)
 library(bioacoustics)
 library(tools)
 library(randomForest)
-
-
-
+# Unfortunately, ohun is currently under policy violation, so for the time being we are using an archived version. We expect this library to be unarchived after investigation.
+url <- "https://cran.r-project.org/src/contrib/Archive/ohun/ohun_1.0.0.tar.gz"
+install.packages(url, type="source", repos=NULL)
+library(ohun)
+library(viridis)
 ```
 
 # Importing Data from the internet
@@ -242,9 +247,6 @@ TD
 detection <- auto_detec(threshold = 5, ssmooth = 300, bp = c(2, 9), wl = 300, path = getwd())
 detection
 
-# Unfortunately, ohun is currently under policy violation, so for the time being we are using an archived version. We expect this library to be unarchived after investigation.
-url <- "https://cran.r-project.org/src/contrib/Archive/ohun/ohun_1.0.0.tar.gz"
-install.packages(url, type="source", repos=NULL)  
 library(ohun)
 library(viridis)
 
@@ -266,7 +268,5 @@ ticks <- c(from = 1000, to = 20000, by = 1000)
 spectro(wav, tlim = temp_slice, FFT_size = 512, ticks_y = ticks) #sets the y axis labeling, in Hz, so its 1 kHz to 100 kHz, in 1 kHz interval
 detection <- auto_detec(threshold = 5, ssmooth = 300, bp = c(2, 9), wl = 300, path = getwd())
 
-library(ohun)
-library(viridis)
 label_spectro(wave = wav, detection = detection[detection$sound.files == "mgr.wav", ], hop.size = 10, ovlp = 50, flim = c(1, 10), fastdisp=TRUE) 
 ```
