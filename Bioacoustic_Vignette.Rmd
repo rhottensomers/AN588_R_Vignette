@@ -14,13 +14,12 @@ Comments
 Challenges
 
 ## Intro to Bioacoustics:
-What is bioacoustics?
 
-Who uses it?
+What is bioacoustics, who uses it, and how is it implemented? 
 
-How it's implemented?
+*this is unfinishied*
+Broadly, bioacoustics is the the crossdisciplinary science of biology and acoustics that studies the production, transmission, and reception of animal sounds. Given the wide range of information that bioacoustics provides, it's used by researchers, physicians, and government agencies.Studying sounds and it's affects on living organisms, can provide powerful insight to structure and dynamics of ecosystems, species biodiversity, habitat health, organismal health, information climate change, and much more. 
 
-What it can be used for and why it is important?
 
 ## Preliminaries
 Install packages: {bioacoustics}, {warbleR}, {randomForest}, {Rraven}
