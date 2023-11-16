@@ -18,7 +18,7 @@ Challenges
 What is bioacoustics, who uses it, and how is it implemented? 
 
 *this is unfinishied*
-Broadly, bioacoustics is the the crossdisciplinary science of biology and acoustics that studies the production, transmission, and reception of animal sounds. Given the wide range of information that bioacoustics provides, it's used by researchers, physicians, and government agencies.Studying sounds and it's affects on living organisms, can provide powerful insight to structure and dynamics of ecosystems, species biodiversity, habitat health, organismal health, information climate change, and much more. 
+Broadly, bioacoustics is the the noninvasive crossdisciplinary science of biology and acoustics that studies the production, transmission, and reception of animal sounds. Given the wide range of information that bioacoustics provides, it's used by researchers, physicians, and government agencies. Studying sounds and it's affects on living organisms, can provide powerful insight into natural history, structure and dynamics of ecosystems, species biodiversity, habitat and species health, information climate change, and much more.  
 
 
 ## Preliminaries
