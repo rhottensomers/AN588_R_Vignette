@@ -210,7 +210,9 @@ TD
 detection <- auto_detec(threshold = 5, ssmooth = 300, bp = c(2, 9), wl = 300, path = getwd())
 detection
 
-#Warning: This function will be deprecated in future warbleR versions, please look at the ohun package for automatic signal detection functions 
+# Unfortunately, ohun is currently under policy violation, so for the time being we are using an archived version. We expect this library to be unarchived after investigation.
+url <- "https://cran.r-project.org/src/contrib/Archive/ohun/ohun_1.0.0.tar.gz"
+install.packages(url, type="source", repos=NULL)  
 library(ohun)
 library(viridis)
 
