@@ -105,34 +105,62 @@ read_all_mp3()
 #Bit is the number of bit per sample
 ```
 
-```{r, plotp}
-# Display with spectro()
-ticks <- c(from = 1000, to = 20000, by = 1000)
 
-temp_slice <- c(from = 1, to = 10) # in seconds
+## Plotting:
+
+Now that we've imported, converted, and read our audio files it's time to plot them. This can be done many different ways depending on what information you need out of your bioacoustic information. These primlimary graph simply display the wave files but later on we will give you a way to graph analysis onto them. 
+
+
+The simplest of the graphs is plot() which plots wave objects. It displays a black and white graph of audio spikes. This is a waveform,  x axis is the time of the file and the yaxis is a amplitude, or the displacement of a particle
+```{r, plotp}
+#first you call your wave audio file that we converted previously: 
 
 plot(STREPV)
 
-#Let's zoom in
-plot(STREPV, xlim = c(3, 5)) #This is a waveform,  x axis is the time of the file and the yaxis is a amplitude, or the displacement of a particle
+#Now let's zoom in on the first audio spike: 
+
+plot(STREPV, xlim = c(3, 5)) # xlim is indicating the time limits to narrow the field of analysis
 ```
 
-
+Plot can also be used with stereo audio files where there is audio from the right and left channel. To see if your data is stero vs mono you can look at the list from either read_audio or read_all_mp3(). Under the audio file it will state Channels(mono/stereo) and if it is stereo you can plot it this way: 
 ```{r, steroplot}
-STREPV2 <- read_audio(file.path(getwd(), "Strepera-versicolor-743906.mp3"))
+ #reads stereo audio and converts it into a wave object. 
+STREPV2 <- read_audio(file.path(getwd(), "Strepera-versicolor-743906.mp3")) 
+
+#displays wave object information. You can see clearly here that STREPV2 is a stereo wave object
 STREPV2
+
+#now let's plot it!
 plot(STREPV2)
 ```
 
+This plot graph is similar to the one above but it has one graph for the right channel and one for the left. Stero and mono wave object do plot differently with plot() so always make sure to confirm what kind of channel your object is. 
+
+While plot() is wonderful spectro() and fspec() are both plotting devices that come with the bioacoustics r package. They are able to generate spectrograms. Spectrograms are a visual representation of the strength or loudness of the audio signal/frequency throughout the wave object. Spectro, true to its name, plots a spectrogram of your data. 
 ```{r, spectro}
+ #First let's look at the parameters within spectrogram:
+?spectro()
+
+#tick indicates the frequency tick marks. We are displaying from 1 to 20 khz by 1khz steps. Different animals may need different frequencies so be sure to check that you are display the correct range. 
+ticks <- c(from = 1000, to = 20000, by = 1000)
+
+#Specify the time limits on the X-axis in seconds (s)
+temp_slice <- c(from = 1, to = 10)
+
 spectro(STREPV, tlim = temp_slice, FFT_size = 512, ticks_y = ticks) #sets the y axis labeling, in Hz, so its 1 kHz to 100 kHz, in 1 kHz interval
 ```
 NOTE: Y axis is frequency in hertz and X axis is time. However spectro() does not have the ability to add x axis label so it should only be used for visualization. 
+Spectro() is wonderful for an elementary spectrogram but there is a better way to visualize the data with fspec(). It is a matrix of amplitude or decibel (dB) values in the time / frequency domain. This function on its own generates only the matris of a spectrogram so in order to visual the data we use image() to display the graph. 
 
 ```{r, fspec}
-image(fspec(STREPV, tlim = temp_slice, rotate = TRUE)) #A matrix of amplitude or decibel (dB) values in the time / frequency domain.
+#First let's look at the parameters:
+?fspec
 
-# col = hcl.colors(20, "viridis", rev = TRUE
+#Now graph!
+image(fspec(STREPV, tlim = temp_slice, rotate = TRUE)) 
+
+#you can also change the color of the graph: 
+image(fspec(STREPV, tlim = temp_slice, rotate = TRUE, col = hcl.colors(20, "viridis", rev = TRUE))) #This is not working rn we should fix it. 
 ```
 
 NOTE: If you have older zero-crossing bat vocalization patterns, then the functions write_zc() and plot_zc() will serve as replacements for fspec() and spectro(). (Add in paragraph after running through spectro and fspec() with an asterisk)
