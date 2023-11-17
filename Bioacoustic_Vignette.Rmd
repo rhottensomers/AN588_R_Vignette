@@ -2,7 +2,12 @@
 title: "Bioacoustic Vignette"
 author: "Reese Hotten-Somers"
 date: "2023-10-26"
-output: html_document
+output:  
+    html_document:
+    theme: cosmo
+    toc: yes
+    toc_float:
+      collapsed: true
 ---
 
 ```{r setup, include=FALSE}
@@ -14,7 +19,7 @@ Comments
 Challenges
 
 ##Preliminaries: 
-Install these packages in *R*:{bioacoustics}, {warbleR}, {randomForest}, {Rraven}
+Install these packages in *R*:{bioacoustics}, {warbleR}, {randomForest}
 
 ## Objectives: 
 The objective of this module is to introduce you to analysis of biacoustic data so that you can read, display, and analyze audio recordings of vocalizations in animals.
