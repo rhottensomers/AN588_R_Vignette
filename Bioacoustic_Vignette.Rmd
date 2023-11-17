@@ -13,10 +13,13 @@ output:
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
-# TO DO:
-Typical frequency ranges for humans, apes, birds, bats, frogs, and whales/dophins
-Comments
-Challenges
+
+# TO DO by Teusday morning:
+Reese will make the file pretty (everyone will say when they are done)
+Sofia: Add pictures (of the bird we are analyzing)
+Paige: Typical frequency ranges for humans, apes, birds, bats, frogs, and whales/dolphins
+Allister: Add the mp3 file that is playable to the markdown
+Ritika: Deep learning
 
 ##Preliminaries: 
 Install these packages in *R*:{bioacoustics}, {warbleR}, {randomForest}
@@ -30,6 +33,14 @@ What is bioacoustics, who uses it, and how is it implemented?
 
 Broadly, bioacoustics is the the noninvasive crossdisciplinary science of biology and acoustics that studies the production, transmission, and reception of animal sounds. Given the wide range of information that bioacoustics provides, it's used by researchers, physicians, and government agencies. Studying sounds and it's affects on living organisms, can provide powerful insight into natural history, structure and dynamics of ecosystems, species biodiversity, habitat and species health, information climate change, and much more.  
 
+### Typical Frequency Ranges:
+* Humans: 100 Hz to 900 Hz
+* Apes: 900 Hz to 1,400 Hz
+* Birds: 1,000 Hz to 8,000 Hz 
+* Bats: 9,000 Hz to 200,000 Hz
+* Frogs: 1500 Hz to 6000 Hz
+* Whales: 30 Hz to 8,000 Hz
+* Dolphins: 200 Hz to 150,000 Hz
 
 ## Load in Packages
 ```{r, prelims}
@@ -37,9 +48,11 @@ library(warbleR)
 library(bioacoustics)
 library(tools)
 library(randomForest)
-
-
-
+# Unfortunately, ohun is currently under policy violation, so for the time being we are using an archived version. We expect this library to be unarchived after investigation.
+url <- "https://cran.r-project.org/src/contrib/Archive/ohun/ohun_1.0.0.tar.gz"
+install.packages(url, type="source", repos=NULL)
+library(ohun)
+library(viridis)
 ```
 
 # Importing Data from the internet
@@ -170,10 +183,37 @@ image(fspec(STREPV, tlim = temp_slice, rotate = TRUE, col = hcl.colors(20, "viri
 NOTE: If you have older zero-crossing bat vocalization patterns, then the functions write_zc() and plot_zc() will serve as replacements for fspec() and spectro(). (Add in paragraph after running through spectro and fspec() with an asterisk)
 
 # Plotting the data
+Now that we have the prepared audiofile in its manipulatative form, we can filter the desired sounds(the bird calls) from background noise(other bird noises, self noise, etc).
 
+Blob_detection is one function that detects and filters audio and displays them in batches. 
+It is a common type of detection/filtration algorithm used not only in audio analysis, but also image processing. Blob detection can be used to filter and identify colors, intensity/brightness etc. 
+
+```{r blob_detec}
+# blob_detection
+#?blob_detection 
+blob_detect <- blob_detection(
+  STREPV, #the waveform of the audiofile
+  time_exp = 1, #Time expansion factor, 1 represents real time
+  min_dur = 25, #min duration of an audio event to be recoreded, in ms
+  max_dur = 1500, #Max duration of audio event, in ms, based on audio 1.5 seconds(1500 ms) is the average length of the birds call
+  LPF = 8000, #Frequnecies above this cutoff are attenuated
+  HPF = 1000, #Frequencies below the cutoff are greatly attenuated.
+  min_TBE = 10,
+  max_TBE = 10000,
+  blur = 0,
+  FFT_size = 256, #
+  settings = FALSE, #simply does not save the parameters for the threshold_detection
+  acoustic_feat = TRUE, 
+  metadata = FALSE, #extracts metadata in a dataframe
+  spectro_dir = file.path(getwd(), "Spectros"), #Gives directions of the folder containing the .png files
+  ticks = TRUE) 
+blob_detect
+```
+The function returns an HTML file which shows all the audio events that fall within the parameters of the function
+
+
+Threshold detection is another form of detection that identifies events based on the SNR, the signal-to-noise ratio. If the amplitude is above the SNR, an audio event is recorded.
 ```{r, plot_data}
-
-
 # blob_detection
 ?blob_detection
 blob_detect <- blob_detection(
@@ -185,7 +225,12 @@ blob_detect
 ?threshold_detection
 TD <- threshold_detection(
   STREPV, 
-  threshold = 12,   time_exp = 1,  min_dur = 140,   max_dur = 440,   min_TBE = 10,  max_TBE = 5000, 
+  threshold = 12, #threshold sets the sensitivity of the event, compared to the SNR
+  time_exp = 1,
+  min_dur = 140, #min duration for 1 audio event
+  max_dur = 440, #max duration for an audio event
+  min_TBE = 10,  
+  max_TBE = 5000, 
   EDG = 0.996, 
   LPF = 10000, 
   HPF = 1000, 
@@ -215,7 +260,6 @@ TD
 detection <- auto_detec(threshold = 5, ssmooth = 300, bp = c(2, 9), wl = 300, path = getwd())
 detection
 
-#Warning: This function will be deprecated in future warbleR versions, please look at the ohun package for automatic signal detection functions 
 library(ohun)
 library(viridis)
 
@@ -237,7 +281,5 @@ ticks <- c(from = 1000, to = 20000, by = 1000)
 spectro(wav, tlim = temp_slice, FFT_size = 512, ticks_y = ticks) #sets the y axis labeling, in Hz, so its 1 kHz to 100 kHz, in 1 kHz interval
 detection <- auto_detec(threshold = 5, ssmooth = 300, bp = c(2, 9), wl = 300, path = getwd())
 
-library(ohun)
-library(viridis)
 label_spectro(wave = wav, detection = detection[detection$sound.files == "mgr.wav", ], hop.size = 10, ovlp = 50, flim = c(1, 10), fastdisp=TRUE) 
 ```
