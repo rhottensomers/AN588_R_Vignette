@@ -28,6 +28,14 @@ What is bioacoustics, who uses it, and how is it implemented?
 
 Broadly, bioacoustics is the the noninvasive crossdisciplinary science of biology and acoustics that studies the production, transmission, and reception of animal sounds. Given the wide range of information that bioacoustics provides, it's used by researchers, physicians, and government agencies. Studying sounds and it's affects on living organisms, can provide powerful insight into natural history, structure and dynamics of ecosystems, species biodiversity, habitat and species health, information climate change, and much more.  
 
+### Typical Frequency Ranges:
+* Humans: 100 Hz to 900 Hz
+* Apes: 900 Hz to 1,400 Hz
+* Birds: 1,000 Hz to 8,000 Hz 
+* Bats: 9,000 Hz to 200,000 Hz
+* Frogs: 1500 Hz to 6000 Hz
+* Whales: 30 Hz to 8,000 Hz
+* Dolphins: 200 Hz to 150,000 Hz
 
 ## Load in Packages
 ```{r, prelims}
