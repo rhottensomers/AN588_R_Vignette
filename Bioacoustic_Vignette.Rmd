@@ -16,7 +16,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 # TO DO by Teusday morning:
 Reese will make the file pretty (everyone will say when they are done)
-Sofia: Add pictures (of the bird we are analyzing)
+Sofia: Add pictures (of the bird we are analyzing) *i added a picture but am not sure if the path i used will work for everyone?*
 Paige: Typical frequency ranges for humans, apes, birds, bats, frogs, and whales/dolphins
 Allister: Add the mp3 file that is playable to the markdown
 Ritika: Deep learning
@@ -85,6 +85,8 @@ wav <- read_audio(file.path(getwd(), "mgr.wav"))
 # Say you have a file saved on your Desktop, your code might look a little like this:
 # wav <- read_audio(file.path("~/Desktop", "mgr.wav"))
 ```
+
+![pied currawong](pied-currawong.png)
 
 Now that we know how to read files, lets load in a file named "Strepera-versicolor-571957.mp3". 
 
