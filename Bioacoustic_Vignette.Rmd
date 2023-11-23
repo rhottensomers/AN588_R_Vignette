@@ -1,27 +1,19 @@
 ---
 title: "Bioacoustic Vignette"
-author: "Reese Hotten-Somers"
-date: "2023-10-26"
+author: "Reese Hotten-Somers, Ritika Sibal, Sofia Weaver, Paige Becker, Allister Malik"
+date: "2023-11-23"
 output:  
     html_document:
     theme: cosmo
-    toc: yes
-    toc_float:
-      collapsed: true
+    toc: true
+    toc_float: true
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-# TO DO by Teusday morning:
-Reese will make the file pretty (everyone will say when they are done)
-Sofia: Add pictures (of the bird we are analyzing) *i added a picture but am not sure if the path i used will work for everyone?*
-Paige: Typical frequency ranges for humans, apes, birds, bats, frogs, and whales/dolphins
-Allister: Add the mp3 file that is playable to the markdown
-Ritika: Deep learning
-
-##Preliminaries: 
+## Preliminaries: 
 Install these packages in *R*:{bioacoustics}, {warbleR}, {randomForest}, {tools}, {viridis}
 
 ## Objectives: 
