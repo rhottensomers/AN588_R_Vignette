@@ -22,7 +22,7 @@ Allister: Add the mp3 file that is playable to the markdown
 Ritika: Deep learning
 
 ##Preliminaries: 
-Install these packages in *R*:{bioacoustics}, {warbleR}, {randomForest}
+Install these packages in *R*:{bioacoustics}, {warbleR}, {randomForest}, {tools}, {viridis}
 
 ## Objectives: 
 The objective of this module is to introduce you to analysis of biacoustic data so that you can read, display, and analyze audio recordings of vocalizations in animals.
@@ -34,6 +34,9 @@ What is bioacoustics, who uses it, and how is it implemented?
 Broadly, bioacoustics is the the noninvasive crossdisciplinary science of biology and acoustics that studies the production, transmission, and reception of animal sounds. Given the wide range of information that bioacoustics provides, it's used by researchers, physicians, and government agencies. Studying sounds and it's affects on living organisms, can provide powerful insight into natural history, structure and dynamics of ecosystems, species biodiversity, habitat and species health, information climate change, and much more.  
 
 ### Typical Frequency Ranges:
+
+Different Sounds will happen at different frequencies. This is important to know because you settings may have to change in order to display and analyze your bioacoustic data correctly. Here are a general list of frequency ranges that you might encounter:
+
 * Humans: 100 Hz to 900 Hz
 * Apes: 900 Hz to 1,400 Hz
 * Birds: 1,000 Hz to 8,000 Hz 
@@ -42,6 +45,7 @@ Broadly, bioacoustics is the the noninvasive crossdisciplinary science of biolog
 * Whales: 30 Hz to 8,000 Hz
 * Dolphins: 200 Hz to 150,000 Hz
 
+First, let's load in the packages that we need:
 ## Load in Packages
 ```{r, prelims}
 library(warbleR)
@@ -55,16 +59,17 @@ library(ohun)
 library(viridis)
 ```
 
-# Importing Data from the internet
-Warblr comes with the function query_xc which allows you to seamlessly import audio data from xeno-canto[https://xeno-canto.org/484847].
+## Importing Data from the internet
+
+The Warblr package comes with the function query_xc which allows you to seamlessly import audio data from xeno-canto[https://xeno-canto.org/484847].
 ```{r, importing}
 #pulling all Strepera versicolor calls without downloading locally
 df1 = query_xc(qword ='Strepera versicolor type:call cnt:"Australia"', download = FALSE) #todo: include explanation for parameters of query_xc
 
 #Filter by type   
-df1 = df1[df1$Vocalization_type=="call",]
-df1 = df1[df1$Quality=="A",]
-df1 = df1[1:9,]
+df1 = df1[df1$Vocalization_type=="call",] #filtering by only calls
+df1 = df1[df1$Quality=="A",] #a type quality
+df1 = df1[1:9,]#takes the first 9 mp3 files 
 View(df1)
 
 #Download data to working directory
@@ -72,11 +77,11 @@ query_xc(X = df1, download = TRUE, path = getwd())
 
 ```
 
-# Importing Your Own Data
+## Importing Your Own Data
 
 Great! Now that we know how to load in data from an cloud-based data set, lets try something that will probably be more useful in your own future research endeavor. Say you are a ecologist who has just come back from a field expedition where you set up passive bio-acoustic monitors. All the recorded audio files (usually in .mp3 or .wav formats) are saved in a harddrive. How would you import your data then?    
 
-You can import you files straight from your Harddrive, Desktop or anywhere else on your personal computer. No need for cloud storage! The following code reads in a file names *mgr.wav* which, for the purpose of this example, has been saved in your working directory. 
+You can import you files straight from your Harddrive, Desktop or anywhere else on your personal computer. No need for cloud storage! The following code reads in a file named *mgr.wav* which, for the purpose of this example, has been saved in your working directory. 
 
 ```{r, importing_mp3}
 # getwd() gets our current working directory and file.path() combines getwd() and "mgr.wav" into a file path format. 
@@ -118,19 +123,10 @@ read_all_mp3 <- function(){
 }
 
 read_all_mp3()
-
-# TO DO: DELETE THIS (I DONT THINK WE NEED IT)
-#Reading a wave object: Duration, file length/durations
-#Number of samples, number of intervals taken from the file
-#Sample rate, the rate of each sample taken. Here's a nice visual[https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/Signal_Sampling.svg/1920px-Signal_Sampling.svg.png]
-  #You can find number of samples by multiplying the Samplingrate by Duration
-#Channels: Is the audio recorded from one source or "channel"(mono) or multiple channels (stereo)
-#PCM is a method used to "digitally represent sampled analog signals."
-#Bit is the number of bit per sample
 ```
 
 
-## Plotting:
+## Plotting the data:
 
 Now that we've imported, converted, and read our audio files it's time to plot them. This can be done many different ways depending on what information you need out of your bioacoustic information. These primlimary graph simply display the wave files but later on we will give you a way to graph analysis onto them. 
 
@@ -182,14 +178,12 @@ Spectro() is wonderful for an elementary spectrogram but there is a better way t
 
 #Now graph!
 image(fspec(STREPV, tlim = temp_slice, rotate = TRUE)) 
-
-#you can also change the color of the graph: 
-image(fspec(STREPV, tlim = temp_slice, rotate = TRUE, col = hcl.colors(20, "viridis", rev = TRUE))) #This is not working rn we should fix it. 
 ```
 
 NOTE: If you have older zero-crossing bat vocalization patterns, then the functions write_zc() and plot_zc() will serve as replacements for fspec() and spectro(). (Add in paragraph after running through spectro and fspec() with an asterisk)
 
-# Plotting the data
+## Plotting parts of the data:
+
 Now that we have the prepared audiofile in its manipulatative form, we can filter the desired sounds(the bird calls) from background noise(other bird noises, self noise, etc).
 
 Blob_detection is one function that detects and filters audio and displays them in batches. 
@@ -214,7 +208,6 @@ blob_detection(
           spectro_dir = file.path(getwd(), "Spectros"), #Path to the filtered spectrogram png files used on the yielded HTML
           time_scale = 2, #Time resolution of the spectrogram in milliseconds (ms) per pixel (px). 
 )
-blob_detect
 ```
 The function returns an HTML file which shows all the audio events that fall within the parameters of the function
 
@@ -252,22 +245,26 @@ TD <- threshold_detection(
   time_scale = 2, 
 )
 TD
+```
 
-
-# auto_detec automatically detects the start and end of vocalizations in sound files based on amplitude, duration, and frequency range attributes.
-# https://rdrr.io/cran/warbleR/man/auto_detec.html
+The auto_detec function automatically detects the start and end of vocalizations in sound files based on amplitude, duration, and frequency range attributes. 
+```{r,autodetec}
+#let's look at the parameters of the function first"
 ?auto_detec
 detection <- auto_detec(threshold = 5, ssmooth = 300, bp = c(2, 9), wl = 300, path = getwd())
 detection
 
-library(ohun)
-library(viridis)
-
 detection$sound.files
+```
+
+
+The packages ohun and viridis allow us to visualize the autodetection points determined above plotted on a spectrogram.
+
+```{r, ohun}
 label_spectro(wave = STREPV, detection = detection[detection$sound.files == "Strepera-versicolor-571957.mp3", ], hop.size = 10, ovlp = 50, flim = c(1, 10), fastdisp=TRUE) 
 ```
 
-# *CHALLENGE*
+## *CHALLENGE*
 1. Record an audio file of you saying something (around 30 seconds!)
 2. Transfer that file onto your laptop. Save it whereever you'd like!
 3. Read in the mp3 file. 
@@ -275,11 +272,11 @@ label_spectro(wave = STREPV, detection = detection[detection$sound.files == "Str
 5. Run a detection algorithm on your file and plot the detection results.
 
 ``` {r Challenge Code}
-wav <- read_audio(file.path("~/Desktop", "your_file_name.wav"))
-temp_slice <- c(from = 10, to = 20) # in seconds
-ticks <- c(from = 1000, to = 20000, by = 1000)
-spectro(wav, tlim = temp_slice, FFT_size = 512, ticks_y = ticks) #sets the y axis labeling, in Hz, so its 1 kHz to 100 kHz, in 1 kHz interval
-detection <- auto_detec(threshold = 5, ssmooth = 300, bp = c(2, 9), wl = 300, path = getwd())
+#wav <- read_audio(file.path("~/Desktop", "your_file_name.wav"))
+#temp_slice <- c(from = 10, to = 20) # in seconds
+#ticks <- c(from = 1000, to = 20000, by = 1000)
+#spectro(wav, tlim = temp_slice, FFT_size = 512, ticks_y = ticks) #sets the y axis labeling, in Hz, so its 1 kHz to 100 kHz, in 1 kHz interval
+#detection <- auto_detec(threshold = 5, ssmooth = 300, bp = c(2, 9), wl = 300, path = getwd())
 
-label_spectro(wave = wav, detection = detection[detection$sound.files == "mgr.wav", ], hop.size = 10, ovlp = 50, flim = c(1, 10), fastdisp=TRUE) 
+#label_spectro(wave = wav, detection = detection[detection$sound.files == "mgr.wav", ], hop.size = 10, ovlp = 50, flim = c(1, 10), fastdisp=TRUE) 
 ```
