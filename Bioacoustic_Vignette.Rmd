@@ -88,7 +88,12 @@ wav <- read_audio(file.path(getwd(), "mgr.wav"))
 
 ![pied currawong](pied-currawong.png)
 
-Now that we know how to read files, lets load in a file named "Strepera-versicolor-571957.mp3". 
+Now that we know how to read files, lets load in a file named "Strepera-versicolor-571957.mp3". Here is the mp3 file:
+```{r, results='asis', echo=FALSE}
+cat('<audio controls> 
+  <source src="Strepera-versicolor-571957.mp3" type="audio/mpeg">
+</audio>') #html code
+```
 
 While reading in one file at a time is helpful, an ecologist returning from a month long expedition will surely have more than one file to read. We have written a funciton here that will read all the mp3 files in your working directory. You could expand on this funciton to read files in different directories or even create a data frame!
 
@@ -193,22 +198,22 @@ It is a common type of detection/filtration algorithm used not only in audio ana
 ```{r blob_detec}
 # blob_detection
 #?blob_detection 
-blob_detect <- blob_detection(
-  STREPV, #the waveform of the audiofile
-  time_exp = 1, #Time expansion factor, 1 represents real time
-  min_dur = 25, #min duration of an audio event to be recoreded, in ms
-  max_dur = 1500, #Max duration of audio event, in ms, based on audio 1.5 seconds(1500 ms) is the average length of the birds call
-  LPF = 8000, #Frequnecies above this cutoff are attenuated
-  HPF = 1000, #Frequencies below the cutoff are greatly attenuated.
-  min_TBE = 10,
+blob_detection(
+  STREPV, #the waveform of the audio file made
+  time_exp = 1, #Time expansion factor, 1 represents real-time
+  min_dur = 44, #Max duration of the audio event, in ms
+  max_dur =1500,  #Max duration of the audio event, in ms, based on the plot(1500 ms) is the average length of the birds call
+  min_area = 100, #Minimum number of pixels in the area of the audio event
+  min_TBE = 20, #Min window between 2 audio events
   max_TBE = 10000,
-  blur = 0,
-  FFT_size = 256, #
-  settings = FALSE, #simply does not save the parameters for the threshold_detection
-  acoustic_feat = TRUE, 
-  metadata = FALSE, #extracts metadata in a dataframe
-  spectro_dir = file.path(getwd(), "Spectros"), #Gives directions of the folder containing the .png files
-  ticks = TRUE) 
+  LPF = 25000, #Low-Pass Filter. Frequencies above the cutoff are not included.
+          HPF = 2000,
+          FFT_size = 256,# Size of the Fast Fourier Transform (FFT) window
+          FFT_overlap = 0.875, #Percentage of overlap between two FFT windows
+          blur = 2, #Gaussian smoothing function for blurring the spectrogram of the audio event to reduce image noise
+          spectro_dir = file.path(getwd(), "Spectros"), #Path to the filtered spectrogram png files used on the yielded HTML
+          time_scale = 2, #Time resolution of the spectrogram in milliseconds (ms) per pixel (px). 
+)
 blob_detect
 ```
 The function returns an HTML file which shows all the audio events that fall within the parameters of the function
@@ -227,31 +232,24 @@ blob_detect
 ?threshold_detection
 TD <- threshold_detection(
   STREPV, 
-  threshold = 12, #threshold sets the sensitivity of the event, compared to the SNR
+  threshold = 12, #threshold sets the sensitivity of the event, compared to the SNR(in dB)
   time_exp = 1,
-  min_dur = 140, #min duration for 1 audio event
-  max_dur = 440, #max duration for an audio event
-  min_TBE = 10,  
-  max_TBE = 5000, 
-  EDG = 0.996, 
-  LPF = 10000, 
-  HPF = 1000, 
-  FFT_size = 256, 
-  FFT_overlap = 0.875, 
+  min_dur = 44,
+  max_dur = 1500, 
+  min_TBE = 20, 
+  max_TBE = 10000, 
+  LPF = 25000, 
+  HPF = 2000, 
   start_thr = 20, 
   end_thr = 30, 
-  SNR_thr = 8, 
-  angle_thr = 125, 
-  duration_thr = 440, 
-  NWS = 1000, 
-  KPE = 1e-05, 
-  KME = 1e-04, 
-  settings = FALSE, 
-  acoustic_feat = TRUE, 
-  metadata = FALSE, 
+  SNR_thr = 8, #SNR threshold (dB) at which the extraction of the audio event stops.
+  angle_thr = 125, #Angle threshold (°) at which the audio event extraction stops.
+  duration_thr = 500, 
+  NWS = 1000, #Length of time used for background noise estimation in the recording (ms)
+  KPE = 1e-05, #Set the Process Error parameter of the Kalman filter. 
+  KME = 1e-04, #Set the Measurement Error parameter of the Kalman filter.
   spectro_dir = file.path(getwd(), "Spectros"), 
-  time_scale = 1, 
-  ticks = TRUE
+  time_scale = 2, 
 )
 TD
 
