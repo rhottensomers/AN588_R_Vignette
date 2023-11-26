@@ -89,7 +89,8 @@ Now that we know how to read files, lets load in a file named "Strepera-versicol
 ```{r, results='asis', echo=FALSE}
 cat('<audio controls> 
   <source src="Strepera-versicolor-571957.mp3" type="audio/mpeg">
-</audio>') #html code
+</audio>') #this is html code I found online to embed mp3 files(https://community.rstudio.com/t/audio-files-in-r-markdown/20874)
+```
 ```
 
 While reading in one file at a time is helpful, an ecologist returning from a month long expedition will surely have more than one file to read. We have written a funciton here that will read all the mp3 files in your working directory. You could expand on this funciton to read files in different directories or even create a data frame!
@@ -178,82 +179,84 @@ NOTE: If you have older zero-crossing bat vocalization patterns, then the functi
 
 Now that we have the prepared audiofile in its manipulatative form, we can filter the desired sounds(the bird calls) from background noise(other bird noises, self noise, etc).
 
-Blob_detection is one function that detects and filters audio and displays them in batches. 
-It is a common type of detection/filtration algorithm used not only in audio analysis, but also image processing. Blob detection can be used to filter and identify colors, intensity/brightness etc. 
-
+Blob_detection is one function that detects and filters audio and displays them in batches. A "blob" is simply an area that is distinguishable from the background.
+It is a common type of detection/filtration algorithm used not only in audio analysis but also in image processing. Blob detection can be used to filter and identify colors, intensity/brightness, etc.
 ```{r blob_detec}
 # blob_detection
-#?blob_detection 
+?blob_detection
 blob_detection(
-  STREPV, #the waveform of the audio file made
+  STREPV, #Waveform of the audio file made
   time_exp = 1, #Time expansion factor, 1 represents real-time
-  min_dur = 44, #Max duration of the audio event, in ms
-  max_dur =1500,  #Max duration of the audio event, in ms, based on the plot(1500 ms) is the average length of the birds call
-  min_area = 100, #Minimum number of pixels in the area of the audio event
-  min_TBE = 20, #Min window between 2 audio events
-  max_TBE = 10000,
-  LPF = 25000, #Low-Pass Filter. Frequencies above the cutoff are not included.
-          HPF = 2000,
-          FFT_size = 256,# Size of the Fast Fourier Transform (FFT) window
-          FFT_overlap = 0.875, #Percentage of overlap between two FFT windows
-          blur = 2, #Gaussian smoothing function for blurring the spectrogram of the audio event to reduce image noise
-          spectro_dir = file.path(getwd(), "Spectros"), #Path to the filtered spectrogram png files used on the yielded HTML
-          time_scale = 2, #Time resolution of the spectrogram in milliseconds (ms) per pixel (px). 
+  min_dur = 20, #Min duration of the threshold, in ms
+  max_dur = 2000,  #Max duration of the threshold, in ms, based on the plot, 1500 ms is the average length of the bird's call, we'll set the max length to be 2 seconds to be safe
+  min_area = 85, #Minimum number of pixels in the area of the audio event. This can be adjusted to filter more sounds out.
+  min_TBE = 1, #Min window between 2 audio events
+  max_TBE = 25000, #Max window between audio events, we don't want to exclude any noises so we can set it to a high measurement
+  LPF = 6000, #Low-Pass Filter. Frequencies above the cutoff are not included. Based on average bird call frequency.
+  HPF = 1000, #High-Pass Filter. Frequencies below the cutoff are not included. Based on average bird call frequency.
+  FFT_size = 512, #Size of the Fast Fourier Transform (FFT) window, essentially the "smoothness" of frequency changes
+  FFT_overlap = 0.875, #Percentage of overlap between two FFT windows
+  blur = 3, #Gaussian smoothing function for blurring the spectrogram of the audio event to reduce image noise
+  spectro_dir = file.path(getwd(), "Spectros"), #Path to the filtered spectrogram png files used in the HTML
+  time_scale = 1, #Time resolution of the spectrogram in milliseconds per pixel.
+  ticks = c(1000, 20000, 1000) #Sets y-axis min, max, and interval width
 )
 ```
-The function returns an HTML file which shows all the audio events that fall within the parameters of the function
+The function returns an HTML file that shows all the audio events that fall within the parameters of the function, and a data frame containing information about the events extracted. This may require trial and error with the arguments to find the events that need to be extracted. As seen above more than 5 events are found. This is because there are changes in the frequency of the calls as well as calls that cannot be seen in the waveform(low in volume). If you play around with some of the parameters for the detection function, you can see the change in the number of blobs identified. Try comparing the blobs with the actual recording and the waveform, what is it picking up?
 
 
-Threshold detection is another form of detection that identifies events based on the SNR, the signal-to-noise ratio. If the amplitude is above the SNR, an audio event is recorded.
+Threshold detection is another form of detection that identifies events based on the SNR, the signal-to-noise ratio. If the amplitude is above the SNR, an audio event is recorded. Mostly, it consists of the same arguments as blob detection with a few additions.
 ```{r, plot_data}
-# blob_detection
-?blob_detection
-blob_detect <- blob_detection(
-  STREPV, time_exp = 10, FFT_size = 512, settings = FALSE, acoustic_feat = TRUE,
-  metadata = FALSE, spectro_dir = file.path(getwd(), "Spectros"), time_scale = 0.1, ticks = TRUE)
-blob_detect
-
 # Threshold_detection
 ?threshold_detection
 TD <- threshold_detection(
   STREPV, 
-  threshold = 12, #threshold sets the sensitivity of the event, compared to the SNR(in dB)
+  threshold = 12, #sets the sensitivity of the event, compared to the SNR(in dB, Lower the threshold for a noisier environment(low SNR); a too low or too high sensitivity may collect too many signals or not enough)
   time_exp = 1,
-  min_dur = 44,
-  max_dur = 1500, 
-  min_TBE = 20, 
-  max_TBE = 10000, 
-  LPF = 25000, 
-  HPF = 2000, 
-  start_thr = 20, 
-  end_thr = 30, 
-  SNR_thr = 8, #SNR threshold (dB) at which the extraction of the audio event stops.
-  angle_thr = 125, #Angle threshold (°) at which the audio event extraction stops.
-  duration_thr = 500, 
-  NWS = 1000, #Length of time used for background noise estimation in the recording (ms)
-  KPE = 1e-05, #Set the Process Error parameter of the Kalman filter. 
-  KME = 1e-04, #Set the Measurement Error parameter of the Kalman filter.
+  min_dur = 20,
+  max_dur = 2000, 
+  min_TBE = 1, 
+  max_TBE = 25000, 
+  LPF = 6000, 
+  HPF = 1000, 
+  start_thr = 60, #start threshold for an audio event, 20dB is recommended for birds
+  end_thr = 80, #end threshold for an audio event, 30dB is recommended for birds
+  SNR_thr = 12, #SNR threshold (dB) at which the extraction of the audio event stops, 8dB is recommended for birds.
+  angle_thr = 170, #Angle threshold at which the audio event extraction stops.
+  duration_thr = 2000, #Maximum duration threshold in milliseconds (ms) after which the monitoring of the background noise is resumed.
+  NWS = 200, #Length of time used for background noise estimation in the recording (ms)
   spectro_dir = file.path(getwd(), "Spectros"), 
-  time_scale = 2, 
+  time_scale = 1, # Time resolution of the spectrogram in milliseconds (ms) per pixel (px).
+  ticks = c(1000, 20000, 1000) #Sets y-axis min, max, and interval width
 )
 TD
 ```
+As you can see this has identified fewer events compared to blob detection(the exact number, actually). See how the extracted data compares between the data frames. Because of how each form of detection filters audio, one type may be better to use than the other.
 
 The auto_detec function automatically detects the start and end of vocalizations in sound files based on amplitude, duration, and frequency range attributes. 
 ```{r,autodetec}
 #let's look at the parameters of the function first"
 ?auto_detec
-detection <- auto_detec(threshold = 5, ssmooth = 300, bp = c(2, 9), wl = 300, path = getwd())
+detection <- auto_detec(threshold = 5,
+ssmooth = 300, #'smoothens' spectrogram
+bp = c(2, 9), #lower and upper limits of a frequency bandpass filter (in kHz)
+wl = 300, #Window used internally for bandpass filtering
+path = getwd())
 detection
 
 detection$sound.files
 ```
 
 
-The packages ohun and viridis allow us to visualize the autodetection points determined above plotted on a spectrogram.
+The packages 'ohun' and 'viridis' allow us to visualize the autodetection points determined above plotted on a spectrogram, this time with labeled axis!
 
 ```{r, ohun}
-label_spectro(wave = STREPV, detection = detection[detection$sound.files == "Strepera-versicolor-571957.mp3", ], hop.size = 10, ovlp = 50, flim = c(1, 10), fastdisp=TRUE) 
+label_spectro(wave = STREPV, #Wave object
+  detection = detection[detection$sound.files == "Strepera-versicolor-571957.mp3", ], #Data frame or 'selection.table' with the detection
+  hop.size = 10, #Time window duration (in ms).
+  ovlp = 50, #% overlap between two consecutive windows
+  flim = c(1, 10), #Frequency limits
+  fastdisp=TRUE) #Faster display of model
 ```
 
 ## *CHALLENGE*
