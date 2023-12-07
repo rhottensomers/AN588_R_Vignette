@@ -265,7 +265,7 @@ wl = 300, # Window used internally for bandpass filtering
 path = getwd())
 ```
 
-The packages 'ohun' and 'viridis' allow us to visualize the autodetection points determined above plotted on a spectrogram, this time with labeled axis!
+The packages 'ohun' and 'viridis' allow us to visualize the autodetection points(from a data frame) determined above plotted on a spectrogram, this time with labeled axis! You may also use reference times to compare different audio files or events.
 ```{r, ohun, message=FALSE, results='hide'}
 label_spectro(wave = STREPV, #Wave object
   detection = detection[detection$sound.files == "Strepera-versicolor-571957.mp3", ], #Data frame or 'selection.table' with the detection
