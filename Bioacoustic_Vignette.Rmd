@@ -74,7 +74,7 @@ query_xc(X = df1, download = TRUE, path = getwd())
 
 Great! Now that we know how to load in data from an cloud-based data set, lets try something that will probably be more useful in your own future research endeavor. Say you are a ecologist who has just come back from a field expedition where you set up passive bio-acoustic monitors. All the recorded audio files (usually in .mp3 or .wav formats) are saved in a harddrive. How would you import your data then?    
 
-You can import you files straight from your Harddrive, Desktop or anywhere else on your personal computer. No need for cloud storage! The following code reads in a file named *mgr.wav* which, for the purpose of this example, has been saved in your working directory. 
+You can import you files straight from your Harddrive, Desktop or anywhere else on your personal computer. No need for cloud storage! The following code reads in a file named *mgr.wav* which, you can download from: *https://github.com/rhottensomers/AN588_R_Vignette/blob/main/mgr.wav* and save in your working directory. 
 
 ```{r, importing_mp3}
 # getwd() gets our current working directory and file.path() combines getwd() and "mgr.wav" into a file path format. 
@@ -97,8 +97,6 @@ cat('<audio controls>
 ```
 </center>
 
-However, while reading in one file at a time is helpful, an ecologist returning from a month long expedition will surely have more than one file to read. We have written a function here that will read all the mp3 files in your working directory. You could expand on this function to read files in different directories or even create a data frame!
-
 Note, when you are sampling audio data, you need to make sure that your sampling rate is greater than twice the highest frequency you will observe. 
 
 <center>
@@ -112,13 +110,15 @@ For Birds (our data here), the highest frequency we would expect is 8000 Hz. Not
 # Read just one file!
 STREPV <- read_audio(file.path(getwd(), "Strepera-versicolor-571957.mp3"))
 STREPV
+```
 
+However, while reading in one file at a time is helpful, an ecologist returning from a month long expedition will surely have more than one file to read. We have written a function here that will read all the mp3 files in your working directory. You could expand on this function to read files in different directories or even create a data frame!
 
+``` {r read_all}
 # Read all the files in your current directory!
 read_all_mp3 <- function(){
   # List all mp3 files in current directory
-  mp3_files = list.files(path=".", pattern=".mp3", all.files=TRUE, 
-                         full.names=TRUE)
+  mp3_files = list.files(path=".", pattern=".mp3", all.files=TRUE, full.names=TRUE)
   audio_list <- list()
   # Append all the files a paths to a single list named audio_list
   for(files in mp3_files) {
