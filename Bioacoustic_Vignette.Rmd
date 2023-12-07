@@ -191,7 +191,7 @@ NOTE: If you have older zero-crossing bat vocalization patterns, then the functi
 
 Now that we have the prepared audiofile in its manipulatative form, we can filter the desired sounds(the bird calls) from background noise(other bird noises, self noise, etc).
 
-Blob_detection is one function that detects and filters audio and displays them in batches. A "blob" is simply an area that is distinguishable from the background.
+Blob_detection is one function that detects and filters audio and displays them in batches. A "blob" is an area that is distinguishable from the background, such as darker pixels.
 It is a common type of detection/filtration algorithm used not only in audio analysis but also in image processing. Blob detection can be used to filter and identify colors, intensity/brightness, etc.
 ```{r blob_detec}
 # blob_detection
@@ -234,7 +234,7 @@ TD <- threshold_detection(
   max_TBE = 25000, 
   LPF = 6000, 
   HPF = 1000, 
-  start_thr = 60, #start threshold for an audio event, 20dB is recommended for birds
+  start_thr = 60, #start threshold for an audio event, 20dB is recommended for birds, we can move from there
   end_thr = 80, #end threshold for an audio event, 30dB is recommended for birds
   SNR_thr = 12, #SNR threshold (dB) at which the extraction of the audio event stops, 8dB is recommended for birds.
   angle_thr = 170, #Angle threshold at which the audio event extraction stops.
