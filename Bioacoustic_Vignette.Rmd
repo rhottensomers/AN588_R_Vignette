@@ -276,21 +276,25 @@ label_spectro(wave = STREPV, #Wave object
 ```
 
 ## **Challenge**
-1. Record an audio file of you saying something (around 30 seconds!)
+1. Record an audio file of you saying something 
 2. Transfer that file onto your laptop. Save it wherever you'd like!
-3. Read in the mp3 file. 
-4. Plot the spectrogram from 10-20 seconds of the audio file.
+3. Read in the audio file. 
+4. Plot the spectrogram from a subset of the audio file. Zoom in on where you believe the sound burst is!
 5. Run a detection algorithm on your file and plot the detection results.
 
 Try this yourself first! When done, check out what we came up with by hitting the "Show" button. 
 ``` {r Challenge Code, eval=F, echo=T, class.source = 'fold-hide'}
-wav <- read_audio(file.path("~/Desktop", "your_file_name.wav"))
-temp_slice <- c(from = 10, to = 20) # in seconds
+# Apple saves audio files in the .m4a format so make sure to convert that to .wav or .mp3 first!
+# You can do that here: https://cloudconvert.com/m4a-to-wav
+filename = "test_audio.wav"
+wav <- read_audio(file.path("~/Desktop", filename))
+temp_slice <- c(from = 5, to = 9) # in seconds
 ticks <- c(from = 1000, to = 20000, by = 1000)
-spectro(wav, tlim = temp_slice, FFT_size = 512, ticks_y = ticks) sets the y axis labeling, in Hz, so its 1 kHz to 100 kHz, in 1 kHz interval
-detection <- auto_detec(threshold = 5, ssmooth = 300, bp = c(2, 9), wl = 300, path = getwd())
+spectro(wav, tlim = temp_slice, FFT_size = 512, ticks_y = ticks) 
+temp_detection <- auto_detec(threshold = 1, ssmooth = 300, bp = c(0.3, 0.6), wl = 300, path = "~/Desktop")
 
-label_spectro(wave = wav, detection = detection[detection$sound.files == "mgr.wav", ], hop.size = 10, ovlp = 50, flim = c(1, 10), fastdisp=TRUE) 
+label_spectro(wave = wav, #Wave object,
+  detection = temp_detection)
 ```
 
 ## References
