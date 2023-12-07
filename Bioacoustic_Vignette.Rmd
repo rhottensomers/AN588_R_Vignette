@@ -1,7 +1,7 @@
 ---
 title: "Bioacoustic Vignette"
 author: "Reese Hotten-Somers, Ritika Sibal, Sofia Weaver, Paige Becker, Allister Malik"
-date: "2023-11-23"
+date: "2023-11-28"
 output:
     html_document:
       code_folding: show
@@ -15,19 +15,19 @@ output:
 knitr::opts_chunk$set(warning = FALSE, message = FALSE) 
 ```
 
-## Preliminaries: 
-Install these packages in *R*:{bioacoustics}, {warbleR}, {randomForest}, {tools}, {viridis}
+## Preliminaries 
+Install these packages in *R*: {bioacoustics}, {warbleR}, {tools}, {viridis}
 
-## Objectives: 
+## Objectives 
 The objective of this module is to introduce you to analysis of biacoustic data so that you can read, display, and analyze audio recordings of vocalizations in animals.
 
-## Intro to Bioacoustics:
+## Intro to Bioacoustics
 
 What is bioacoustics, who uses it, and how is it implemented? 
 
 Broadly, bioacoustics is the the noninvasive crossdisciplinary science of biology and acoustics that studies the production, transmission, and reception of animal sounds. Given the wide range of information that bioacoustics provides, it's used by researchers, physicians, and government agencies. Studying sounds and it's affects on living organisms, can provide powerful insight into natural history, structure and dynamics of ecosystems, species biodiversity, habitat and species health, information climate change, and much more.  
 
-### Typical Frequency Ranges:
+### Typical Frequency Ranges
 
 Different Sounds will happen at different frequencies. This is important to know because you settings may have to change in order to display and analyze your bioacoustic data correctly. Here are a general list of frequency ranges that you might encounter:
 
@@ -40,6 +40,7 @@ Different Sounds will happen at different frequencies. This is important to know
 * Dolphins: 200 Hz to 150,000 Hz
 
 First, let's load in the packages that we need:
+
 ## Load in Packages
 ```{r, prelims, message=FALSE, results='hide'}
 library(warbleR)
@@ -55,10 +56,10 @@ library(viridis)
 
 ## Importing Data from the internet
 
-The Warblr package comes with the function query_xc which allows you to seamlessly import audio data from xeno-canto[https://xeno-canto.org/484847].
+The warbleR package comes with the function query_xc which allows you to seamlessly import audio data from [xeno-canto] (https://xeno-canto.org/484847).
 ```{r, importing, message=FALSE, results='hide'}
 # pulling all Strepera versicolor calls without downloading locally
-df1 = query_xc(qword ='Strepera versicolor type:call cnt:"Australia"', download = FALSE) #todo: include explanation for parameters of query_xc
+df1 = query_xc(qword ='Strepera versicolor type:call cnt:"Australia"', download = FALSE)
 
 # Filter by type   
 df1 = df1[df1$Vocalization_type=="call",] #filtering by only calls
@@ -73,7 +74,7 @@ query_xc(X = df1, download = TRUE, path = getwd())
 
 Great! Now that we know how to load in data from an cloud-based data set, lets try something that will probably be more useful in your own future research endeavor. Say you are a ecologist who has just come back from a field expedition where you set up passive bio-acoustic monitors. All the recorded audio files (usually in .mp3 or .wav formats) are saved in a harddrive. How would you import your data then?    
 
-You can import you files straight from your Harddrive, Desktop or anywhere else on your personal computer. No need for cloud storage! The following code reads in a file named *mgr.wav* which, for the purpose of this example, has been saved in your working directory. 
+You can import you files straight from your Harddrive, Desktop or anywhere else on your personal computer. No need for cloud storage! The following code reads in a file named *mgr.wav* which, you can download from: *https://github.com/rhottensomers/AN588_R_Vignette/blob/main/mgr.wav* and save in your working directory. 
 
 ```{r, importing_mp3}
 # getwd() gets our current working directory and file.path() combines getwd() and "mgr.wav" into a file path format. 
@@ -86,7 +87,7 @@ wav <- read_audio(file.path(getwd(), "mgr.wav"))
 Now that we know how to read files, lets load in a file named "Strepera-versicolor-571957.mp3". Here is the mp3 file:
 
 <center>
-![*pied currawong*](pied-currawong.png){width=70%}\
+![*gray.currawong*](gray.currawong.png){width=60%}\
 
 ```{r, results='asis', echo=FALSE}
 cat('<audio controls> 
@@ -96,19 +97,28 @@ cat('<audio controls>
 ```
 </center>
 
-However, while reading in one file at a time is helpful, an ecologist returning from a month long expedition will surely have more than one file to read. We have written a function here that will read all the mp3 files in your working directory. You could expand on this function to read files in different directories or even create a data frame!
+Note, when you are sampling audio data, you need to make sure that your sampling rate is greater than twice the highest frequency you will observe. 
+
+<center>
+![*nyquist*](nyquist.png){width=70%}\
+</center>
+
+
+For Birds (our data here), the highest frequency we would expect is 8000 Hz. Notice here that the sampling rate here is more than double that frequency. 
 
 ```{r, readf}
 # Read just one file!
 STREPV <- read_audio(file.path(getwd(), "Strepera-versicolor-571957.mp3"))
 STREPV
+```
 
+However, while reading in one file at a time is helpful, an ecologist returning from a month long expedition will surely have more than one file to read. We have written a function here that will read all the mp3 files in your working directory. You could expand on this function to read files in different directories or even create a data frame!
 
+``` {r read_all}
 # Read all the files in your current directory!
 read_all_mp3 <- function(){
   # List all mp3 files in current directory
-  mp3_files = list.files(path=".", pattern=".mp3", all.files=TRUE, 
-                         full.names=TRUE)
+  mp3_files = list.files(path=".", pattern=".mp3", all.files=TRUE, full.names=TRUE)
   audio_list <- list()
   # Append all the files a paths to a single list named audio_list
   for(files in mp3_files) {
@@ -122,9 +132,9 @@ read_all_mp3()
 ```
 
 
-## Plotting the data:
+## Plotting the data
 
-Now that we've imported, converted, and read our audio files it's time to plot them. This can be done many different ways depending on what information you need out of your bioacoustic information. These primlimary graph simply display the wave files but later on we will give you a way to graph analysis onto them. 
+Now that we've imported, converted, and read our audio files it's time to plot them. This can be done many different ways depending on what information you need out of your bioacoustic information. These primarily graph simply display the wave files but later on we will give you a way to graph analysis onto them. 
 
 
 The simplest of the graphs is plot() which plots wave objects. It displays a black and white graph of audio spikes. This is a waveform,  x axis is the time of the file and the yaxis is a amplitude, or the displacement of a particle
@@ -136,7 +146,7 @@ plot(STREPV)
 plot(STREPV, xlim = c(3, 5)) # xlim is indicating the time limits to narrow the field of analysis
 ```
 
-Plot can also be used with stereo audio files where there is audio from the right and left channel. To see if your data is stero vs mono you can look at the list from either read_audio or read_all_mp3(). Under the audio file it will state Channels(mono/stereo) and if it is stereo you can plot it this way: 
+Plot can also be used with stereo audio files where there is audio from the right and left channel. To see if your data is stereo vs mono you can look at the list from either read_audio or read_all_mp3(). Under the audio file it will state Channels(mono/stereo) and if it is stereo you can plot it this way: 
 ```{r, steroplot}
  # Reads stereo audio and converts it into a wave object. 
 STREPV2 <- read_audio(file.path(getwd(), "Strepera-versicolor-743906.mp3")) 
@@ -177,16 +187,16 @@ image(fspec(STREPV, tlim = temp_slice, rotate = TRUE))
 
 NOTE: If you have older zero-crossing bat vocalization patterns, then the functions write_zc() and plot_zc() will serve as replacements for fspec() and spectro(). (Add in paragraph after running through spectro and fspec() with an asterisk)
 
-## Plotting parts of the data:
+## Plotting parts of the data
 
 Now that we have the prepared audiofile in its manipulatative form, we can filter the desired sounds(the bird calls) from background noise(other bird noises, self noise, etc).
 
 Blob_detection is one function that detects and filters audio and displays them in batches. A "blob" is simply an area that is distinguishable from the background.
 It is a common type of detection/filtration algorithm used not only in audio analysis but also in image processing. Blob detection can be used to filter and identify colors, intensity/brightness, etc.
-```{r blob_detec, message=FALSE, results='hide'}
+```{r blob_detec}
 # blob_detection
 ?blob_detection
-blob_detection(
+BD <- blob_detection(
   STREPV, #Waveform of the audio file made
   time_exp = 1, #Time expansion factor, 1 represents real-time
   min_dur = 20, #Min duration of the threshold, in ms
@@ -201,15 +211,17 @@ blob_detection(
   blur = 3, #Gaussian smoothing function for blurring the spectrogram of the audio event to reduce image noise
   spectro_dir = file.path(getwd(), "Spectros"), #Path to the filtered spectrogram png files used in the HTML
   time_scale = 1, #Time resolution of the spectrogram in milliseconds per pixel.
-  ticks = c(1000, 20000, 1000) #Sets y-axis min, max, and interval width
+  ticks = c(1000, 20000, 1000), #Sets y-axis min, max, and interval width
+  acoustic_feat = FALSE
 )
+BD
 ```
 ![blob detections](blob_detect.png)\
 
 The function returns an HTML file that shows all the audio events that fall within the parameters of the function, and a data frame containing information about the events extracted. This may require trial and error with the arguments to find the events that need to be extracted. As seen above more than 5 events are found. This is because there are changes in the frequency of the calls as well as calls that cannot be seen in the waveform(low in volume). If you play around with some of the parameters for the detection function, you can see the change in the number of blobs identified. Try comparing the blobs with the actual recording and the waveform, what is it picking up?
 
 Threshold detection is another form of detection that identifies events based on the SNR, the signal-to-noise ratio. If the amplitude is above the SNR, an audio event is recorded. Mostly, it consists of the same arguments as blob detection with a few additions.
-```{r, plot_data, message=FALSE, results='hide'}
+```{r, plot_data}
 # Threshold_detection
 ?threshold_detection
 TD <- threshold_detection(
@@ -230,8 +242,10 @@ TD <- threshold_detection(
   NWS = 200, #Length of time used for background noise estimation in the recording (ms)
   spectro_dir = file.path(getwd(), "Spectros"), 
   time_scale = 1, # Time resolution of the spectrogram in milliseconds (ms) per pixel (px).
-  ticks = c(1000, 20000, 1000) #Sets y-axis min, max, and interval width
+  ticks = c(1000, 20000, 1000), #Sets y-axis min, max, and interval width
+  acoustic_feat = FALSE
 )
+TD
 ```
 
 ![thresh detections](thresh_1.png)\
@@ -244,9 +258,9 @@ Third, the auto_detec function automatically detects the start and end of vocali
 ```{r,autodetec, message=FALSE, results='hide'}
 # Let's look at the parameters of the function first
 ?auto_detec
-detection <- auto_detec(threshold = 5,
+detection <- auto_detec(threshold = 12,
 ssmooth = 300, # 'smoothens' spectrogram
-bp = c(2, 9), # lower and upper limits of a frequency bandpass filter (in kHz)
+bp = c(1, 6), # lower and upper limits of a frequency bandpass filter (in kHz)
 wl = 300, # Window used internally for bandpass filtering
 path = getwd())
 ```
@@ -261,20 +275,29 @@ label_spectro(wave = STREPV, #Wave object
   fastdisp=TRUE) #Faster display of model
 ```
 
-## *CHALLENGE*
-1. Record an audio file of you saying something (around 30 seconds!)
+## **Challenge**
+1. Record an audio file of you saying something 
 2. Transfer that file onto your laptop. Save it wherever you'd like!
-3. Read in the mp3 file. 
-4. Plot the spectrogram from 10-20 seconds of the audio file.
+3. Read in the audio file. 
+4. Plot the spectrogram from a subset of the audio file. Zoom in on where you believe the sound burst is!
 5. Run a detection algorithm on your file and plot the detection results.
 
 Try this yourself first! When done, check out what we came up with by hitting the "Show" button. 
 ``` {r Challenge Code, eval=F, echo=T, class.source = 'fold-hide'}
-wav <- read_audio(file.path("~/Desktop", "your_file_name.wav"))
-temp_slice <- c(from = 10, to = 20) # in seconds
+# Apple saves audio files in the .m4a format so make sure to convert that to .wav or .mp3 first!
+# You can do that here: https://cloudconvert.com/m4a-to-wav
+filename = "test_audio.wav"
+wav <- read_audio(file.path("~/Desktop", filename))
+temp_slice <- c(from = 5, to = 9) # in seconds
 ticks <- c(from = 1000, to = 20000, by = 1000)
-spectro(wav, tlim = temp_slice, FFT_size = 512, ticks_y = ticks) sets the y axis labeling, in Hz, so its 1 kHz to 100 kHz, in 1 kHz interval
-detection <- auto_detec(threshold = 5, ssmooth = 300, bp = c(2, 9), wl = 300, path = getwd())
+spectro(wav, tlim = temp_slice, FFT_size = 512, ticks_y = ticks) 
+temp_detection <- auto_detec(threshold = 1, ssmooth = 300, bp = c(0.3, 0.6), wl = 300, path = "~/Desktop")
 
-label_spectro(wave = wav, detection = detection[detection$sound.files == "mgr.wav", ], hop.size = 10, ovlp = 50, flim = c(1, 10), fastdisp=TRUE) 
+label_spectro(wave = wav, #Wave object,
+  detection = temp_detection)
 ```
+
+## References
+*https://cran.r-project.org/web/packages/bioacoustics/vignettes/tutorial.html*
+*https://cran.r-project.org/web/packages/warbleR/vignettes/warbleR_workflow_01.html*
+*https://cran.r-project.org/web/packages/Rraven/vignettes/Rraven.html*
