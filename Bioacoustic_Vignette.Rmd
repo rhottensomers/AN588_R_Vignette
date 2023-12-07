@@ -234,9 +234,9 @@ TD <- threshold_detection(
   max_TBE = 25000, 
   LPF = 6000, 
   HPF = 1000, 
-  start_thr = 60, #start threshold for an audio event, 20dB is recommended for birds, we can move from there
-  end_thr = 80, #end threshold for an audio event, 30dB is recommended for birds
-  SNR_thr = 12, #SNR threshold (dB) at which the extraction of the audio event stops, 8dB is recommended for birds.
+  start_thr = 60, #start threshold for an audio event
+  end_thr = 80, #end threshold for an audio event
+  SNR_thr = 12, #SNR threshold (dB) at which the extraction of the audio event stops
   angle_thr = 170, #Angle threshold at which the audio event extraction stops.
   duration_thr = 2000, #Maximum duration threshold in milliseconds (ms) after which the monitoring of the background noise is resumed.
   NWS = 200, #Length of time used for background noise estimation in the recording (ms)
