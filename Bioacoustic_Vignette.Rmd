@@ -56,36 +56,75 @@ library(ohun)
 library(viridis)
 ```
 
-## Importing Data from the Internet
+## Exploring xeno-canto
 
 The warbleR package comes with the function query_xc which allows you to seamlessly import audio data from [xeno-canto](https://xeno-canto.org/484847).
+<br>  
+
+### xeno-canto Homepage
+
+xeno-canto is a collaborative project that allows scientists, or anyone to download, upload or just explore animal sounds from all over the world for free! Here is what the homepage looks like:  
 
 <center>
-![](xc/xc-homepage.png){width=60%}\
-<center>
-![](xc/xc-explore-tab.png){width=60%}\
+![](xc/xc-homepage.png){width=60%}\  
+<br>
+### xeno-canto Explore Tab
 
+Under the the 'Explore' tab, you are given the option to search for animal sounds [by region](https://xeno-canto.org/explore/region), [by taxonomy](https://xeno-canto.org/explore/taxonomy), [by recent recordings](https://xeno-canto.org/explore?query=since:31&dir=0&order=xc), or if you want a [random recording](https://xeno-canto.org/explore/random)!   <br><br>
+Here, we are going to practice browsing by region.  
+<br>
+<center>
+![](xc/xc-explore-tab.png){width=60%}\   
+<br>   
+  
+### xeno-canto Region Tab  
+  
+<br>  
+
+When you click 'By Region', xeno-canto will take you to an interactive map of the World.   
+<br>
 <center>
 ![](xc/xc-explore-by-region.png){width=60%}\
-
+<br><br>
+You can then choose a region of interest by holding shift, and dragging your mouse over the area you'd like to take a closer look at. Let's zoom in on Vietnam and Cambodia:   
+<br>
 <center>
 ![](xc/xc-region.png){width=60%}\
-
+<br>
+Areas marked with red dots have a high density of recordings, yellow dots have a medium density, and blue have the least. You can click on any dot and it will give you a complete list of all of the animals recorded in the area. Let's click on this red hotspot:  
+<br>
 <center>
 ![](xc/xc-region-hotspot.png){width=60%}\
-
+<br>
+From this list, we can click on any link and get a quick summary of the sound, location, sound type, recorder, and scientific name. 
+<br>
 
 <center>
 ![](xc/xc-region-greenpeafowl.png){width=60%}\
+<br>
+Here, we can see...    
+Name: Green Peafowl  
+Sound: A recording that is 1:09 long  
+Location: Cat Tien National Park, Cochinchina, Vietnam  
+Sound Type: song  
+Recorder: Arnold Meijer  
+Scientific Name: *Pavo muticus*  
+
+<br> 
+We can then click on the link attached to the xeno-canto ID (XC35681), and we will get sent to a page with much more detail on the specific recording including: basic data, sound details, technical details, location, download details, and citation details.  
+<br>
 
 
 <center>
 ![](xc/xc-greenpeafowl-info.png){width=60%}\
+<br>
+Now, that we are used to the website, it's time to download some recordings!
+<br>
 
-
+## Importing Data from the Internet
 
 ```{r, importing, message=FALSE, results='hide'}
-# remove all mp3 files in youe working directory
+# remove all mp3 files in your working directory
 unlink(file.path(getwd(),"*.mp3"))
 # pulling all Strepera versicolor calls without downloading locally
 df1 = query_xc(qword ='Strepera versicolor type:call cnt:"Australia"', download = FALSE)
