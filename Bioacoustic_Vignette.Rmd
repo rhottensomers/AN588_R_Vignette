@@ -57,6 +57,31 @@ library(viridis)
 ## Importing Data from the internet
 
 The warbleR package comes with the function query_xc which allows you to seamlessly import audio data from [xeno-canto] (https://xeno-canto.org/484847).
+
+<center>
+![](xc/xc-homepage.png){width=60%}\
+<center>
+![](xc/xc-explore-tab.png){width=60%}\
+
+<center>
+![](xc/xc-explore-by-region.png){width=60%}\
+
+<center>
+![](xc/xc-region.png){width=60%}\
+
+<center>
+![](xc/xc-region-hotspot.png){width=60%}\
+
+
+<center>
+![](xc/xc-region-greenpeafowl.png){width=60%}\
+
+
+<center>
+![](xc/xc-greenpeafowl-info.png){width=60%}\
+
+
+
 ```{r, importing, message=FALSE, results='hide'}
 # pulling all Strepera versicolor calls without downloading locally
 df1 = query_xc(qword ='Strepera versicolor type:call cnt:"Australia"', download = FALSE)
