@@ -48,6 +48,7 @@ library(bioacoustics)
 library(tools)
 library(randomForest)
 library(ggplot2)
+library(curl)
 # Unfortunately, ohun is currently under policy violation, so for the time being we are using an archived version. We expect this library to be unarchived after investigation.
 url <- "https://cran.r-project.org/src/contrib/Archive/ohun/ohun_1.0.0.tar.gz"
 install.packages(url, type="source", repos=NULL)
@@ -55,9 +56,9 @@ library(ohun)
 library(viridis)
 ```
 
-## Importing Data from the internet
+## Importing Data from the Internet
 
-The warbleR package comes with the function query_xc which allows you to seamlessly import audio data from [xeno-canto] (https://xeno-canto.org/484847).
+The warbleR package comes with the function query_xc which allows you to seamlessly import audio data from [xeno-canto](https://xeno-canto.org/484847).
 
 <center>
 ![](xc/xc-homepage.png){width=60%}\
@@ -102,12 +103,13 @@ query_xc(X = df1, download = TRUE, path = getwd())
 
 Great! Now that we know how to load in data from an cloud-based data set, lets try something that will probably be more useful in your own future research endeavor. Say you are a ecologist who has just come back from a field expedition where you set up passive bio-acoustic monitors. All the recorded audio files (usually in .mp3 or .wav formats) are saved in a harddrive. How would you import your data then?    
 
-You can import you files straight from your Harddrive, Desktop or anywhere else on your personal computer. No need for cloud storage! The following code reads in a file named *mgr.wav* which, you can download from: *https://github.com/rhottensomers/AN588_R_Vignette/blob/main/mgr.wav* and save in your working directory. 
+You can import you files straight from your Harddrive, Desktop or anywhere else on your personal computer. No need for cloud storage! 
 
 ```{r, importing_mp3}
 # getwd() gets our current working directory and file.path() combines getwd() and "mgr.wav" into a file path format.
-#f <- curl("http://raw.githubusercontent.com/rhottensomers/AN588_R_Vignette/main/mgr.wav")
-#wav <- read_audio(file.path(getwd(), "mgr.wav"))
+# The following code downloads a file named *mgr.wav* from: https://github.com/rhottensomers/AN588_R_Vignette/blob/main/mgr.wav and saves it in your working directory. 
+f <- curl_download('http://raw.githubusercontent.com/rhottensomers/AN588_R_Vignette/main/mgr.wav', file.path(getwd(), "mgr.wav"))
+wav <- read_audio(file.path(getwd(), "mgr.wav"))
 
 # Say you have a file saved on your Desktop, your code might look a little like this:
 # wav <- read_audio(file.path("~/Desktop", "mgr.wav"))
