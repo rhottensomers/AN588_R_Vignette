@@ -67,14 +67,17 @@ xeno-canto is a collaborative project that allows scientists, or anyone to downl
 
 <center>
 ![](xc/xc-homepage.png){width=60%}\  
+</center>
 <br>
+
 ### xeno-canto Explore Tab
 
 Under the the 'Explore' tab, you are given the option to search for animal sounds [by region](https://xeno-canto.org/explore/region), [by taxonomy](https://xeno-canto.org/explore/taxonomy), [by recent recordings](https://xeno-canto.org/explore?query=since:31&dir=0&order=xc), or if you want a [random recording](https://xeno-canto.org/explore/random)!   <br><br>
 Here, we are going to practice browsing by region.  
 <br>
 <center>
-![](xc/xc-explore-tab.png){width=60%}\   
+![](xc/xc-explore-tab.png){width=60%}\ 
+</center>
 <br>   
   
 ### xeno-canto Region Tab  
@@ -85,22 +88,26 @@ When you click 'By Region', xeno-canto will take you to an interactive map of th
 <br>
 <center>
 ![](xc/xc-explore-by-region.png){width=60%}\
+</center>
 <br><br>
 You can then choose a region of interest by holding shift, and dragging your mouse over the area you'd like to take a closer look at. Let's zoom in on Vietnam and Cambodia:   
 <br>
 <center>
 ![](xc/xc-region.png){width=60%}\
+</center>
 <br>
 Areas marked with red dots have a high density of recordings, yellow dots have a medium density, and blue have the least. You can click on any dot and it will give you a complete list of all of the animals recorded in the area. Let's click on this red hotspot:  
 <br>
 <center>
 ![](xc/xc-region-hotspot.png){width=60%}\
+</center>
 <br>
 From this list, we can click on any link and get a quick summary of the sound, location, sound type, recorder, and scientific name. 
 <br>
 
 <center>
 ![](xc/xc-region-greenpeafowl.png){width=60%}\
+</center>
 <br>
 Here, we can see...    
 Name: Green Peafowl  
@@ -117,6 +124,7 @@ We can then click on the link attached to the xeno-canto ID (XC35681), and we wi
 
 <center>
 ![](xc/xc-greenpeafowl-info.png){width=60%}\
+</center>
 <br>
 Now, that we are used to the website, it's time to download some recordings!
 <br>
