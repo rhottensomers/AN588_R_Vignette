@@ -1,5 +1,5 @@
 ---
-title: "Bioacoustic Vignette"
+title: "Getting Started with Bioacoustics"
 author: "Reese Hotten-Somers, Ritika Sibal, Sofia Weaver, Paige Becker, Allister Malik"
 date: "2023-11-28"
 output:
@@ -47,6 +47,7 @@ library(warbleR)
 library(bioacoustics)
 library(tools)
 library(randomForest)
+library(ggplot2)
 # Unfortunately, ohun is currently under policy violation, so for the time being we are using an archived version. We expect this library to be unarchived after investigation.
 url <- "https://cran.r-project.org/src/contrib/Archive/ohun/ohun_1.0.0.tar.gz"
 install.packages(url, type="source", repos=NULL)
@@ -83,6 +84,8 @@ The warbleR package comes with the function query_xc which allows you to seamles
 
 
 ```{r, importing, message=FALSE, results='hide'}
+# remove all mp3 files in youe working directory
+unlink(file.path(getwd(),"*.mp3"))
 # pulling all Strepera versicolor calls without downloading locally
 df1 = query_xc(qword ='Strepera versicolor type:call cnt:"Australia"', download = FALSE)
 
@@ -102,8 +105,9 @@ Great! Now that we know how to load in data from an cloud-based data set, lets t
 You can import you files straight from your Harddrive, Desktop or anywhere else on your personal computer. No need for cloud storage! The following code reads in a file named *mgr.wav* which, you can download from: *https://github.com/rhottensomers/AN588_R_Vignette/blob/main/mgr.wav* and save in your working directory. 
 
 ```{r, importing_mp3}
-# getwd() gets our current working directory and file.path() combines getwd() and "mgr.wav" into a file path format. 
-wav <- read_audio(file.path(getwd(), "mgr.wav"))
+# getwd() gets our current working directory and file.path() combines getwd() and "mgr.wav" into a file path format.
+#f <- curl("http://raw.githubusercontent.com/rhottensomers/AN588_R_Vignette/main/mgr.wav")
+#wav <- read_audio(file.path(getwd(), "mgr.wav"))
 
 # Say you have a file saved on your Desktop, your code might look a little like this:
 # wav <- read_audio(file.path("~/Desktop", "mgr.wav"))
@@ -141,23 +145,23 @@ However, while reading in one file at a time is helpful, an ecologist returning 
 
 ``` {r read_all}
 # Read all the files in your current directory!
-read_all_mp3 <- function(){
+read_all_mp3 <- function(path){
   # List all mp3 files in current directory
-  mp3_files = list.files(path=".", pattern=".mp3", all.files=TRUE, full.names=TRUE)
-  audio_list <- list()
+  mp3_files = dir(path, pattern = "[.]mp3$")
+  audio_list <- c()
   # Append all the files a paths to a single list named audio_list
   for(files in mp3_files) {
-    curr_file_path <- read_audio(file.path(files))
-    audio_list <- append(audio_list, curr_file_path)
+    curr_file_path <- read_audio(file.path(getwd(),files))
+    audio_list <- c(audio_list, curr_file_path)
   }
   return(audio_list)
 }
 
-read_all_mp3()
+read_all_mp3(getwd())
 ```
 
 
-## Plotting the data
+## Plotting the Data
 
 Now that we've imported, converted, and read our audio files it's time to plot them. This can be done many different ways depending on what information you need out of your bioacoustic information. These primarily graph simply display the wave files but later on we will give you a way to graph analysis onto them. 
 
@@ -212,11 +216,10 @@ image(fspec(STREPV, tlim = temp_slice, rotate = TRUE))
 
 NOTE: If you have older zero-crossing bat vocalization patterns, then the functions write_zc() and plot_zc() will serve as replacements for fspec() and spectro(). (Add in paragraph after running through spectro and fspec() with an asterisk)
 
-## Plotting parts of the data
-
+## Detecting Acoustic Events
 Now that we have the prepared audiofile in its manipulatative form, we can filter the desired sounds(the bird calls) from background noise(other bird noises, self noise, etc).
 
-Blob_detection is one function that detects and filters audio and displays them in batches. A "blob" is simply an area that is distinguishable from the background.
+Blob_detection is one function that detects and filters audio and displays them in batches. A "blob" is an area that is distinguishable from the background, such as darker pixels.
 It is a common type of detection/filtration algorithm used not only in audio analysis but also in image processing. Blob detection can be used to filter and identify colors, intensity/brightness, etc.
 ```{r blob_detec}
 # blob_detection
@@ -259,9 +262,9 @@ TD <- threshold_detection(
   max_TBE = 25000, 
   LPF = 6000, 
   HPF = 1000, 
-  start_thr = 60, #start threshold for an audio event, 20dB is recommended for birds
-  end_thr = 80, #end threshold for an audio event, 30dB is recommended for birds
-  SNR_thr = 12, #SNR threshold (dB) at which the extraction of the audio event stops, 8dB is recommended for birds.
+  start_thr = 60, #start threshold for an audio event
+  end_thr = 80, #end threshold for an audio event
+  SNR_thr = 12, #SNR threshold (dB) at which the extraction of the audio event stops
   angle_thr = 170, #Angle threshold at which the audio event extraction stops.
   duration_thr = 2000, #Maximum duration threshold in milliseconds (ms) after which the monitoring of the background noise is resumed.
   NWS = 200, #Length of time used for background noise estimation in the recording (ms)
@@ -290,7 +293,7 @@ wl = 300, # Window used internally for bandpass filtering
 path = getwd())
 ```
 
-The packages 'ohun' and 'viridis' allow us to visualize the autodetection points determined above plotted on a spectrogram, this time with labeled axis!
+The packages 'ohun' and 'viridis' allow us to visualize the autodetection points(from a data frame) determined above plotted on a spectrogram, this time with labeled axis! You may also use reference times to compare different audio files or events.
 ```{r, ohun, message=FALSE, results='hide'}
 label_spectro(wave = STREPV, #Wave object
   detection = detection[detection$sound.files == "Strepera-versicolor-571957.mp3", ], #Data frame or 'selection.table' with the detection
@@ -299,6 +302,102 @@ label_spectro(wave = STREPV, #Wave object
   flim = c(1, 10), #Frequency limits
   fastdisp=TRUE) #Faster display of model
 ```
+
+## Application: Duration Analysis
+Now that we know how to detect acoustic events, lets actually use our methods to make some generalizations. At the start of this vignette, we downloaded 9 audio files of the Strepera-versicolor calls. If we were to want to characterize these calls one way to do so would be by the call duration. However, manually figuring out the call duration, either by a stopwatch or manually measure the spectro() plots, would be timely and prone to error. Let's instead get the duration of the Strepera-versicolor call and then compare it to another vocalisation: song.
+
+``` {r duration of call}
+# Read all audio files in the working dir
+all_audio <- read_all_mp3(getwd())
+durations <- c()
+for (STREPV in all_audio){
+  # Append all detection to a single list
+  TD <- threshold_detection(
+  STREPV, 
+  threshold = 12, #sets the sensitivity of the event, compared to the SNR(in dB, Lower the threshold for a noisier environment(low SNR); a too low or too high sensitivity may collect too many signals or not enough)
+  time_exp = 1,
+  min_dur = 20,
+  max_dur = 2000, 
+  min_TBE = 1, 
+  max_TBE = 25000, 
+  LPF = 6000, 
+  HPF = 1000, 
+  start_thr = 60, #start threshold for an audio event
+  end_thr = 80, #end threshold for an audio event
+  SNR_thr = 12, #SNR threshold (dB) at which the extraction of the audio event stops
+  angle_thr = 170, #Angle threshold at which the audio event extraction stops.
+  duration_thr = 2000, #Maximum duration threshold in milliseconds (ms) after which the monitoring of the background noise is resumed.
+  NWS = 200, #Length of time used for background noise estimation in the recording (ms)
+  spectro_dir = file.path(getwd(), "Spectros"), 
+  time_scale = 1, # Time resolution of the spectrogram in milliseconds (ms) per pixel (px).
+  ticks = c(1000, 20000, 1000), #Sets y-axis min, max, and interval width
+  acoustic_feat = FALSE)
+  # Append all the duration to a single list
+  durations <- c(durations, TD[["data"]][["event_data"]][["duration"]])
+}
+
+# Create a dataframe with acoustic event and duration
+df_spectro1 = data.frame(Type=c("Call"),duration=durations)
+# Delete all the .mp3 files in the working directory
+unlink(file.path(getwd(),"*.mp3"))
+
+# Now lets look at songs
+df1 = query_xc(qword ='Strepera versicolor cnt:"Australia"', download = FALSE)
+
+# Filter by type   
+df1 = df1[(df1$Vocalization_type=="song"),] #filtering by only songs
+# Download data to working directory
+query_xc(X = df1, download = TRUE, path = getwd())
+
+# Again, read all the audio files in the working directory
+new_audio <- read_all_mp3(getwd())
+durations <- c()
+for (STREPV in new_audio){
+  # Append all detection to a single list
+  TD <- threshold_detection(
+  STREPV, 
+  threshold = 12, #sets the sensitivity of the event, compared to the SNR(in dB, Lower the threshold for a noisier environment(low SNR); a too low or too high sensitivity may collect too many signals or not enough)
+  time_exp = 1,
+  min_dur = 20,
+  max_dur = 2000, 
+  min_TBE = 1, 
+  max_TBE = 25000, 
+  LPF = 6000, 
+  HPF = 1000, 
+  start_thr = 60, #start threshold for an audio event
+  end_thr = 80, #end threshold for an audio event
+  SNR_thr = 12, #SNR threshold (dB) at which the extraction of the audio event stops
+  angle_thr = 170, #Angle threshold at which the audio event extraction stops.
+  duration_thr = 2000, #Maximum duration threshold in milliseconds (ms) after which the monitoring of the background noise is resumed.
+  NWS = 200, #Length of time used for background noise estimation in the recording (ms)
+  spectro_dir = file.path(getwd(), "Spectros"), 
+  time_scale = 1, # Time resolution of the spectrogram in milliseconds (ms) per pixel (px).
+  ticks = c(1000, 20000, 1000), #Sets y-axis min, max, and interval width
+  acoustic_feat = FALSE)
+  # Append all the duration to a single list
+  durations <- c(durations, TD[["data"]][["event_data"]][["duration"]])
+}
+
+# Add acoustic type and duration into a dataframe
+df_spectro2 = data.frame(Type=c("Song"),duration=durations)
+# Create a single data frame with all duration data
+df_spectro <- rbind(df_spectro1, df_spectro2)
+
+# Create a box plot of call and song duration
+ggplot() + geom_boxplot(data=df_spectro, aes(x=Type, y=duration, fill=Type), alpha=0.5, color="grey", fill="pink",) + coord_cartesian(ylim = c(0, 500)) + xlab("Vocalization Type") + ylab("Duration (s)") + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), axis.line = element_line(colour = "black"), panel.background = element_blank())
+
+# Conduct a T-test to compare durations in song and calls
+t.test(df_spectro[df_spectro$Type == 'Call', 'duration'], df_spectro[df_spectro$Type == 'Song', 'duration'], alternative = "two.sided", var.equal = FALSE)
+```
+
+Based on our box plot and T-test we can see that there is a significant difference in the duration between song and call. The p-value is  0.004394, meaning we can reject the null hypothesis that the durations are the same. It looks like calls tend to be longer than songs with the prior having a mean duration of 206.2134s and latter having a mean duration of 121.4947s 
+
+## Application: Machine Learning Models
+![*machinelearning.png*](machinelearning.png)\
+
+<br> One of the most interesting and useful use of these detection methods is to aid in building a testing dataset for machine learning models. Broadly, supervised machine learning models are trained on a 'ground truth' set of data (see above figure). Creating this ground truth is usually a manual process: human coders going thorough the data and labeling it. In the realm of bioacoustics, this would mean looking at the spectro() plots for all your audio files and manually noting where the start and end times of the audio events are. 
+
+As you can imagine, this is very labor intensive! It could take years to compile a good enough data set. So, minimizing the time spent labeling is a top priority. To do this you can first use the detection methods above to auto-detect audio events. Then, a human could go in and clean up the detection by visual quality control--a much less labor intensive process. This way you can quickly generate good quality ground truth data sets to train your machine learning models on! Better ground truth = better machine learning model. This will also be important as your machine learning models increase in complexity and the number of animals you want to identify increases.
 
 ## **Challenge**
 1. Record an audio file of you saying something 
@@ -313,16 +412,18 @@ Try this yourself first! When done, check out what we came up with by hitting th
 # You can do that here: https://cloudconvert.com/m4a-to-wav
 filename = "test_audio.wav"
 wav <- read_audio(file.path("~/Desktop", filename))
-temp_slice <- c(from = 5, to = 9) # in seconds
+temp_slice <- c(from = 5, to = 9) # in seconds, change to where your sound event is!
 ticks <- c(from = 1000, to = 20000, by = 1000)
 spectro(wav, tlim = temp_slice, FFT_size = 512, ticks_y = ticks) 
+# Notice that we changed the bp= field (band pass) to filter based on the typical frequencies for human sound!
 temp_detection <- auto_detec(threshold = 1, ssmooth = 300, bp = c(0.3, 0.6), wl = 300, path = "~/Desktop")
+# You may need to play with the threshold= field to make sure your detections are as intended
 
-label_spectro(wave = wav, #Wave object,
-  detection = temp_detection)
+label_spectro(wave = wav, detection = temp_detection)
 ```
 
 ## References
 *https://cran.r-project.org/web/packages/bioacoustics/vignettes/tutorial.html*
 *https://cran.r-project.org/web/packages/warbleR/vignettes/warbleR_workflow_01.html*
 *https://cran.r-project.org/web/packages/Rraven/vignettes/Rraven.html*
+*https://medium.com/@tekaround/train-validation-test-set-in-machine-learning-how-to-understand-6cdd98d4a764*
